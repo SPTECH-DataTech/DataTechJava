@@ -1,13 +1,17 @@
+import client.S3Provider;
+import client.S3Service;
 import org.springframework.jdbc.core.JdbcTemplate;
 import writer.ConexaoBanco;
 
 public class Main {
 
     public static void main(String[] args) {
+        S3Service s3Service = new S3Service(new S3Provider().getS3Client(), "bucket-data-tech");
 
-        Log logs = new Log();
-        logs.mostrarLogs();
 
+  /*s3Service.uploadFiles("C:/Users/sdssd/Desktop/file.txt");*/
+        s3Service.listObjects();
+        s3Service.downloadFiles();
         ConexaoBanco conexaoBanco = new ConexaoBanco();
         JdbcTemplate connection = conexaoBanco.getConnection();
 
