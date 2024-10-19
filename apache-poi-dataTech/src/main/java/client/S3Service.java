@@ -38,23 +38,21 @@ public class S3Service {
     public void uploadFiles(String filePath) {
         try {
             File file = new File(filePath);
-            /*String fileName = file.getName();*/
+            String fileName = file.getName();
 
-            String uniqueFileName = UUID.randomUUID().toString() + ".txt";
+//            String uniqueFileName = UUID.randomUUID().toString() + ".txt";
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(uniqueFileName)
+                    .key(fileName)
                     .build();
 
             s3Client.putObject(putObjectRequest, RequestBody.fromFile(file));
 
-
-            System.out.println("Arquivo '" + file.getName() + "' enviado com sucesso com o nome: " + uniqueFileName);
+            System.out.println("Arquivo '" + file.getName() + "' enviado com sucesso com o nome: ");
         } catch (S3Exception e) {
             System.err.println("Erro ao fazer upload do arquivo: " + e.getMessage());
         }
     }
-
 
     public void listObjects() {
         try {
@@ -75,7 +73,7 @@ public class S3Service {
 
     public void downloadFiles() {
         try {
-            String diretorioDownload = System.getProperty("user.home") + "/Downloads/";
+            String diretorioDownload = "C:\\GitHub\\DataTechJava\\";
             List<S3Object> objects = s3Client.listObjects(ListObjectsRequest.builder().bucket(bucketName).build()).contents();
             for (S3Object object : objects) {
                 GetObjectRequest getObjectRequest = GetObjectRequest.builder()
