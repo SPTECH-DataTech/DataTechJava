@@ -6,8 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="Log-dataTech" />
+        <module name="apache-poi-dataTech" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Log-dataTech" target="21" />
+    </bytecodeTargetLevel>
   </component>
 </project>
