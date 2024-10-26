@@ -11,9 +11,9 @@ public class ConexaoBanco {
 
     public ConexaoBanco() {
         BasicDataSource basicDataSource = new BasicDataSource();
-        basicDataSource.setUrl("jdbc:mysql://3.86.158.143:3306/datatech");
+        basicDataSource.setUrl("jdbc:mysql://localhost:3306/datatech");
         basicDataSource.setUsername("root");
-        basicDataSource.setPassword("datatech123");
+        basicDataSource.setPassword("sada1613");
 
         this.dataSource = basicDataSource;
     }
