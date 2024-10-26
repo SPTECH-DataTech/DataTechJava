@@ -1,5 +1,7 @@
 package client;
 
+import commons.BancoConnection;
+import org.springframework.jdbc.core.JdbcTemplate;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -11,12 +13,18 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import datatech.log.Log;
+import writer.ConexaoBanco;
 
 public class S3Service {
     private S3Client s3Client;
     private String bucketName;
+    private String aplicacao = "conexao-bucket";
+    BancoConnection conexao = new BancoConnection();
+
 
     public S3Service(S3Client s3Client, String bucketName) {
         this.s3Client = s3Client;
@@ -29,9 +37,11 @@ public class S3Service {
                     .bucket(bucketName)
                     .build();
             s3Client.createBucket(createBucketRequest);
-            System.out.println("Bucket criado com sucesso: " + bucketName);
+            Log log = new Log(this.aplicacao, LocalDate.now(), "Bucket criado com sucesso: " + bucketName);
+            conexao.inserirLogNoBanco(log);
+
         } catch (S3Exception e) {
-            System.err.println("Erro ao criar o bucket: " + e.getMessage());
+            Log log = new Log(this.aplicacao, LocalDate.now(), "Erro ao criar o bucket: " + e.getMessage() + bucketName);
         }
     }
 
@@ -48,9 +58,12 @@ public class S3Service {
 
             s3Client.putObject(putObjectRequest, RequestBody.fromFile(file));
 
-            System.out.println("Arquivo '" + file.getName() + "' enviado com sucesso com o nome: ");
+            System.out.println();
+            Log log = new Log(this.aplicacao, LocalDate.now(), "Arquivo '" + file.getName() + "' enviado com sucesso com o nome: ");
+            conexao.inserirLogNoBanco(log);
         } catch (S3Exception e) {
-            System.err.println("Erro ao fazer upload do arquivo: " + e.getMessage());
+            System.err.println();
+            Log log = new Log(this.aplicacao, LocalDate.now(), "Erro ao fazer upload do arquivo: " + e.getMessage());
         }
     }
 
