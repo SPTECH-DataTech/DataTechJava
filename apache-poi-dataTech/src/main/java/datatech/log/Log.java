@@ -2,16 +2,17 @@ package datatech.log;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class Log {
 
     private String nomeUsuario;
     private String aplicacao;
-    private LocalDate dataHora;
+    private LocalDateTime dataHora;
     private String descricao;
 
-    public Log(String aplicacao, LocalDate dataHora, String descricao) {
+    public Log(String aplicacao, LocalDateTime dataHora, String descricao) {
         this.aplicacao = aplicacao;
         this.dataHora = dataHora;
         this.descricao = descricao;
@@ -21,7 +22,7 @@ public class Log {
         return aplicacao;
     }
 
-    public LocalDate getData() {
+    public LocalDateTime getData() {
         return dataHora;
     }
 
@@ -33,7 +34,7 @@ public class Log {
         this.aplicacao = aplicacao;
     }
 
-    public void setData(LocalDate dataHora) {
+    public void setData(LocalDateTime dataHora) {
         this.dataHora = dataHora;
     }
 
