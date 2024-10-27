@@ -1,7 +1,7 @@
 # Compiled class file
 *.class
 
-# Log file
+# datatech.log.Log file
 *.log
 
 # BlueJ files
@@ -11,7 +11,6 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.nar
 *.ear

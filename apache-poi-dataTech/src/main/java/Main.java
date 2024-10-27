@@ -1,25 +1,35 @@
 import client.S3Provider;
 import client.S3Service;
+import datatech.log.Log;
 import org.springframework.jdbc.core.JdbcTemplate;
 import processor.Leitor;
 import processor.Plantacao;
 import processor.clima.Clima;
 import processor.clima.LeitorClima;
 import writer.ConexaoBanco;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        //S3
-        //Acessar bucket
+        List<Log> logs = new ArrayList<Log>();
+        String aplicacao = "Main";
+
         String bucketName = "bucket-data-tech";
-        S3Service s3Service = new S3Service(new S3Provider().getS3Client(), bucketName);
+        S3Service conexaoBucket = new S3Service(new S3Provider().getS3Client(), bucketName);
+
+
+        String uploadfilePath = "C:\\Users\\JOOJ\\Documents\\bases-para-tratar\\base-de-dados-para-tratar.xlsx";
+        conexaoBucket.uploadFiles(uploadfilePath);
+
+        conexaoBucket.listObjects();
+        conexaoBucket.downloadFiles();
 
         //Fazer upload do arquivo de platações
         String uploadfilePath = "C:\\Users\\JOOJ\\AppData\\Desktop\\upload-bases\\base-de-dados-para-tratar.xlsx";
@@ -35,6 +45,7 @@ public class Main {
         s3Service.listObjects();
         s3Service.downloadFiles();
 
+
         /*===================================================================================================================*/
 
         //Leitura
@@ -42,26 +53,31 @@ public class Main {
         String nomeArquivoClima = "C:\\Users\\sdssd\\Downloads\\bases-minas-1985\\downloadsdados_83083_M_1985-01-01_1985-12-31.xlsx";
 
 
-        // Carregando o arquivo excel
         Path caminho = Path.of(nomeArquivo);
         InputStream arquivo = Files.newInputStream(caminho);
+
 
         Path caminhoClima = Path.of(nomeArquivoClima);
         InputStream arquivoClima = Files.newInputStream(caminho);
 
         // Extraindo os livros do arquivo
+
         Leitor leitor = new Leitor();
         LeitorClima leitorClima = new LeitorClima();
 
         List<Plantacao> plantacoes = leitor.extrairPlantacao(nomeArquivo, arquivo);
         List<Clima> climas = leitorClima.extrairClimas(nomeArquivoClima, arquivoClima);
 
-        // Fechando o arquivo após a extração
         arquivo.close();
 
         /*====================================================================================*/
 
         //BD
+
+        ConexaoBanco conexao = new ConexaoBanco();
+        conexao.inserirPlantacoesNoBanco(plantacoes);
+        Log log = new Log(aplicacao + " ", LocalDateTime.now(), " Plantações inseridas com sucesso no banco de dados");
+
         System.out.println("Plantações extraídas com sucesso");
 
         /*===============================*/
@@ -83,6 +99,6 @@ public class Main {
         }
         System.out.println("Inserções encerradas");
 
-    }
 
+    }
 }
