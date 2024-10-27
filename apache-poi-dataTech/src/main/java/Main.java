@@ -32,14 +32,15 @@ public class Main {
         /*===================================================================================================================*/
 
         //Leitura
-        String nomeArquivo = "base-de-dados-para-tratar.xlsx";
+        String nomeArquivo = "./base-de-dados-para-tratar.xlsx";
         String nomeArquivoClima = "downloadsdados_83083_M_1985-01-01_1985-12-31.xlsx";
 
         Path caminho = Path.of(nomeArquivo);
         InputStream arquivo = Files.newInputStream(caminho);
 
+
         Path caminhoClima = Path.of(nomeArquivoClima);
-        InputStream arquivoClima = Files.newInputStream(caminhoClima);
+        InputStream arquivoClima = Files.newInputStream(caminho);
 
         // Extraindo os livros do arquivo
 
