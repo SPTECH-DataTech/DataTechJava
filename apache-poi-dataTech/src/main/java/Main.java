@@ -18,12 +18,17 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        //S3
         List<Log> logs = new ArrayList<Log>();
         String aplicacao = "Main";
 
         String bucketName = "bucket-data-tech";
         S3Service conexaoBucket = new S3Service(new S3Provider().getS3Client(), bucketName);
+
+        //Fazer upload do arquivo de platações
+        String uploadfilePath = "C:\\Users\\JOOJ\\AppData\\Desktop\\upload-bases\\base-de-dados-para-tratar.xlsx";
+        conexaoBucket.uploadFiles(uploadfilePath);
+
+//        conexaoBucket.uploadFiles(uploadfilePathClima);
 
         //Fazer download do arquivo no bucket
         conexaoBucket.listObjects();
@@ -32,8 +37,9 @@ public class Main {
         /*===================================================================================================================*/
 
         //Leitura
-        String nomeArquivo = "./base-de-dados-para-tratar.xlsx";
+        String nomeArquivo = "download-basesbase-de-dados-para-tratar.xlsx";
         String nomeArquivoClima = "downloadsdados_83083_M_1985-01-01_1985-12-31.xlsx";
+
 
         Path caminho = Path.of(nomeArquivo);
         InputStream arquivo = Files.newInputStream(caminho);
