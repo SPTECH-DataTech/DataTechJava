@@ -20,6 +20,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         List<Log> logs = new ArrayList<Log>();
         String aplicacao = "Main";
+        ConexaoBanco conexaoBanco = new ConexaoBanco();
 
         String bucketName = "bucket-data-tech";
         S3Service conexaoBucket = new S3Service(new S3Provider().getS3Client(), bucketName);
@@ -51,30 +52,25 @@ public class Main {
         List<Clima> climas = leitorClima.extrairClimas(nomeArquivoClima, arquivoClima);
 
         arquivo.close();
-
+        Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "Plantações extraídas com sucesso");
+        conexaoBanco.inserirLogNoBanco(logExtracaoBase);
+        System.out.println("Plantações extraídas com sucesso");
         /*====================================================================================*/
 
         //BD
-
-        ConexaoBanco conexao = new ConexaoBanco();
-        conexao.inserirPlantacoesNoBanco(plantacoes);
-        Log log = new Log(aplicacao + " ", LocalDateTime.now(), " Plantações inseridas com sucesso no banco de dados");
-
-        System.out.println("Plantações extraídas com sucesso");
-
-        /*===============================*/
-
+        Log logConexaoBanco = new Log(aplicacao, LocalDateTime.now(), "Realizando conexão com o Banco de Dados...");
+        conexaoBanco.inserirLogNoBanco(logConexaoBanco);
         System.out.println("Realizando conexão com o Banco de Dados...");
-        ConexaoBanco conexaoBanco = new ConexaoBanco();
-        JdbcTemplate connection = conexaoBanco.getConnection();
+        ConexaoBanco conexao = new ConexaoBanco();
 
+        Log logInsercaoBanco = new Log(aplicacao, LocalDateTime.now(), "Inserindo dados lidos no Banco de dados...");
+        conexaoBanco.inserirLogNoBanco(logInsercaoBanco);
         System.out.println("Inserindo dados lidos no Banco de dados...");
+        conexao.inserirPlantacoesNoBanco(plantacoes);
 
-        for (Clima clima : climas) {
-            connection.update("INSERT INTO climaMunicipioDash (data, temperaturaMax, temperaturaMin, umidadeMedia) VALUES (?,?,?,?)",
-                    clima.getDataMedicao(), clima.getMediaTemperaturaMaxima(), clima.getMediaTemperaturaMinima(), clima.getUmidadeAr()
-            );
-        }
+        Log logSucesso = new Log(aplicacao + " ", LocalDateTime.now(), " Plantações inseridas com sucesso no banco de dados");
+        conexao.inserirLogNoBanco(logSucesso);
+
         System.out.println("Inserções encerradas");
 
 
