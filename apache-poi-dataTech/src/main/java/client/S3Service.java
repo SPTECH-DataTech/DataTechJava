@@ -98,7 +98,7 @@ public class S3Service {
 
     public void downloadFiles() {
         try {
-            String diretorioDownload = "C:\\GitHub\\DataTechJava\\";
+            String diretorioDownload = "C:\\Users\\sdssd\\Downloads\\bases-minas-1985\\downloads";
             List<S3Object> objects = s3Client.listObjects(ListObjectsRequest.builder().bucket(bucketName).build()).contents();
             for (S3Object object : objects) {
                 GetObjectRequest getObjectRequest = GetObjectRequest.builder()
