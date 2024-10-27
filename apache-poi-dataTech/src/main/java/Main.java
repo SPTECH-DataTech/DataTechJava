@@ -18,47 +18,28 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) throws IOException {
+        //S3
         List<Log> logs = new ArrayList<Log>();
         String aplicacao = "Main";
 
         String bucketName = "bucket-data-tech";
         S3Service conexaoBucket = new S3Service(new S3Provider().getS3Client(), bucketName);
 
-
-//        String uploadfilePath = "C:\\Users\\JOOJ\\Documents\\bases-para-tratar\\base-de-dados-para-tratar.xlsx";
-//        conexaoBucket.uploadFiles(uploadfilePath);
-
-        conexaoBucket.listObjects();
-        conexaoBucket.downloadFiles();
-
-        //Fazer upload do arquivo de platações
-        String uploadfilePath = "C:\\Users\\JOOJ\\AppData\\Desktop\\upload-bases\\base-de-dados-para-tratar.xlsx";
-        conexaoBucket.uploadFiles(uploadfilePath);
-
-        //Fazer upload do arquivo de clima
-//        String uploadfilePathClima = "C:\\Users\\sdssd\\Downloads\\bases-minas-1985\\$2a$10$GykUAnrS37vFzhNB8gywzef6VaMVb02fTcgIt8ZGbsl6XML48UTWy\\clima\\dados_83083_M_1985-01-01_1985-12-31.xlsx";
-
-
-//        conexaoBucket.uploadFiles(uploadfilePathClima);
-
         //Fazer download do arquivo no bucket
         conexaoBucket.listObjects();
         conexaoBucket.downloadFiles();
-
 
         /*===================================================================================================================*/
 
         //Leitura
         String nomeArquivo = "base-de-dados-para-tratar.xlsx";
-        String nomeArquivoClima = "C:\\Users\\sdssd\\Downloads\\bases-minas-1985\\downloadsdados_83083_M_1985-01-01_1985-12-31.xlsx";
-
+        String nomeArquivoClima = "downloadsdados_83083_M_1985-01-01_1985-12-31.xlsx";
 
         Path caminho = Path.of(nomeArquivo);
         InputStream arquivo = Files.newInputStream(caminho);
 
-
         Path caminhoClima = Path.of(nomeArquivoClima);
-        InputStream arquivoClima = Files.newInputStream(caminho);
+        InputStream arquivoClima = Files.newInputStream(caminhoClima);
 
         // Extraindo os livros do arquivo
 
