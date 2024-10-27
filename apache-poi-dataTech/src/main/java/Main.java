@@ -24,12 +24,6 @@ public class Main {
         String bucketName = "bucket-data-tech";
         S3Service conexaoBucket = new S3Service(new S3Provider().getS3Client(), bucketName);
 
-        //Fazer upload do arquivo de platações
-        String uploadfilePath = "C:\\Users\\JOOJ\\AppData\\Desktop\\upload-bases\\base-de-dados-para-tratar.xlsx";
-        conexaoBucket.uploadFiles(uploadfilePath);
-
-//        conexaoBucket.uploadFiles(uploadfilePathClima);
-
         //Fazer download do arquivo no bucket
         conexaoBucket.listObjects();
         conexaoBucket.downloadFiles();
