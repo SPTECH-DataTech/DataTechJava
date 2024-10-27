@@ -25,25 +25,25 @@ public class Main {
         S3Service conexaoBucket = new S3Service(new S3Provider().getS3Client(), bucketName);
 
 
-        String uploadfilePath = "C:\\Users\\JOOJ\\Documents\\bases-para-tratar\\base-de-dados-para-tratar.xlsx";
-        conexaoBucket.uploadFiles(uploadfilePath);
+//        String uploadfilePath = "C:\\Users\\JOOJ\\Documents\\bases-para-tratar\\base-de-dados-para-tratar.xlsx";
+//        conexaoBucket.uploadFiles(uploadfilePath);
 
         conexaoBucket.listObjects();
         conexaoBucket.downloadFiles();
 
         //Fazer upload do arquivo de platações
         String uploadfilePath = "C:\\Users\\JOOJ\\AppData\\Desktop\\upload-bases\\base-de-dados-para-tratar.xlsx";
-        s3Service.uploadFiles(uploadfilePath);
+        conexaoBucket.uploadFiles(uploadfilePath);
 
         //Fazer upload do arquivo de clima
-        String uploadfilePathClima = "C:\\Users\\sdssd\\Downloads\\bases-minas-1985\\$2a$10$GykUAnrS37vFzhNB8gywzef6VaMVb02fTcgIt8ZGbsl6XML48UTWy\\clima\\dados_83083_M_1985-01-01_1985-12-31.xlsx";
+//        String uploadfilePathClima = "C:\\Users\\sdssd\\Downloads\\bases-minas-1985\\$2a$10$GykUAnrS37vFzhNB8gywzef6VaMVb02fTcgIt8ZGbsl6XML48UTWy\\clima\\dados_83083_M_1985-01-01_1985-12-31.xlsx";
 
 
-        s3Service.uploadFiles(uploadfilePathClima);
+//        conexaoBucket.uploadFiles(uploadfilePathClima);
 
         //Fazer download do arquivo no bucket
-        s3Service.listObjects();
-        s3Service.downloadFiles();
+        conexaoBucket.listObjects();
+        conexaoBucket.downloadFiles();
 
 
         /*===================================================================================================================*/
@@ -92,10 +92,6 @@ public class Main {
             connection.update("INSERT INTO climaMunicipioDash (data, temperaturaMax, temperaturaMin, umidadeMedia) VALUES (?,?,?,?)",
                     clima.getDataMedicao(), clima.getMediaTemperaturaMaxima(), clima.getMediaTemperaturaMinima(), clima.getUmidadeAr()
             );
-        }
-        for (Plantacao plantacao : plantacoes) {
-            connection.update("INSERT INTO plantacao (fk_municipio, ano, area_plantada, quantidade_colhida, valor_total_reais) VALUES (?,?,?,?,?)",
-                    plantacao.getMunicipio(), plantacao.getAno(), plantacao.getAreaPlantada(), plantacao.getQuantidadeColhida(), plantacao.getValorReais());
         }
         System.out.println("Inserções encerradas");
 
