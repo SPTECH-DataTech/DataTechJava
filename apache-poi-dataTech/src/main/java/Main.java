@@ -39,7 +39,6 @@ public class Main {
         Path caminho = Path.of(nomeArquivo);
         InputStream arquivo = Files.newInputStream(caminho);
 
-
         Path caminhoClima = Path.of(nomeArquivoClima);
         InputStream arquivoClima = Files.newInputStream(caminho);
 
@@ -49,7 +48,7 @@ public class Main {
         LeitorClima leitorClima = new LeitorClima();
 
         List<Plantacao> plantacoes = leitor.extrairPlantacao(nomeArquivo, arquivo);
-        List<Clima> climas = leitorClima.extrairClimas(nomeArquivoClima, arquivoClima);
+//        List<Clima> climas = leitorClima.extrairClimas(nomeArquivoClima, arquivoClima);
 
         arquivo.close();
         Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "Plantações extraídas com sucesso");
@@ -61,8 +60,8 @@ public class Main {
         Log logConexaoBanco = new Log(aplicacao, LocalDateTime.now(), "Realizando conexão com o Banco de Dados...");
         conexaoBanco.inserirLogNoBanco(logConexaoBanco);
         System.out.println("Realizando conexão com o Banco de Dados...");
-        ConexaoBanco conexao = new ConexaoBanco();
 
+        ConexaoBanco conexao = new ConexaoBanco();
         Log logInsercaoBanco = new Log(aplicacao, LocalDateTime.now(), "Inserindo dados lidos no Banco de dados...");
         conexaoBanco.inserirLogNoBanco(logInsercaoBanco);
         System.out.println("Inserindo dados lidos no Banco de dados...");
@@ -72,7 +71,6 @@ public class Main {
         conexao.inserirLogNoBanco(logSucesso);
 
         System.out.println("Inserções encerradas");
-
 
     }
 }
