@@ -25,7 +25,6 @@ public class S3Service {
     private String aplicacao = "conexao-bucket";
     ConexaoBanco conexao = new ConexaoBanco();
 
-
     public S3Service(S3Client s3Client, String bucketName) {
         this.s3Client = s3Client;
         this.bucketName = bucketName;

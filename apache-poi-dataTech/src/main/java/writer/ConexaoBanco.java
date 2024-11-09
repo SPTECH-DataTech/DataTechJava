@@ -4,18 +4,22 @@ import datatech.log.Log;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import processor.Plantacao;
+import processor.clima.Clima;
 
 import javax.sql.DataSource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ConexaoBanco {
 
     private final DataSource dataSource;
 
+    private String aplicacao = "Conexao-banco";
+
     public ConexaoBanco() {
         BasicDataSource basicDataSource = new BasicDataSource();
 
-        basicDataSource.setUrl("jdbc:mysql://18.232.151.200:3306/datatech");
+        basicDataSource.setUrl("jdbc:mysql://54.221.33.27:3306/datatech");
         basicDataSource.setUsername("root");
         basicDataSource.setPassword("datatech123");
 
@@ -35,12 +39,17 @@ public class ConexaoBanco {
     }
 
     public void inserirPlantacoesNoBanco(List<Plantacao> plantacoes) {
-        System.out.println("Inserindo dados lidos no Banco de dados...");
         for (Plantacao plantacao : plantacoes) {
             gerarNovaConeexao().update("INSERT INTO plantacaoMunicipioDash (fkMunicipio, ano, areaPlantada, quantidadeColhida, valorTotalReais) VALUES (?,?,?,?,?)",
                     plantacao.getMunicipio(), plantacao.getAno(), plantacao.getAreaPlantada(), plantacao.getQuantidadeColhida(), plantacao.getValorReais());
         }
-        System.out.println("Inserções encerradas");
+    }
+
+    public void inserirClimasNoBanco(List<Clima> climas) {
+        for (Clima clima : climas) {
+            gerarNovaConeexao().update("INSERT INTO climaMunicipioDash (data, temperaturaMax, temperaturaMin, umidadeMedia) VALUES (?,?,?,?)",
+                    clima.getDataMedicao(), clima.getMediaTemperaturaMaxima(), clima.getMediaTemperaturaMinima(), clima.getUmidadeAr());
+        }
     }
 
     public JdbcTemplate getConnection() {

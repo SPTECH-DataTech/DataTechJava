@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class LeitorClima {
     public LeitorClima() {
     }
 
-    public List<Clima> extrairClimas(String nomeArquivo, InputStream arquivo) {
+    public List<Clima> extrairClimas(Path nomeArquivo, InputStream arquivo) {
         try {
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
 
