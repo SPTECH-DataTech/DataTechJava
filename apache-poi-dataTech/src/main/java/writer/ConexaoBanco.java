@@ -19,7 +19,7 @@ public class ConexaoBanco {
     public ConexaoBanco() {
         BasicDataSource basicDataSource = new BasicDataSource();
 
-        basicDataSource.setUrl("jdbc:mysql://54.221.33.27:3306/datatech");
+        basicDataSource.setUrl("jdbc:mysql://54.242.34.150:3306/datatech");
         basicDataSource.setUsername("root");
         basicDataSource.setPassword("datatech123");
 
@@ -40,13 +40,14 @@ public class ConexaoBanco {
 
     public void inserirPlantacoesNoBanco(List<Plantacao> plantacoes) {
         for (Plantacao plantacao : plantacoes) {
-            gerarNovaConeexao().update("INSERT INTO plantacaoMunicipioDash (fkMunicipio, ano, areaPlantada, quantidadeColhida, valorTotalReais) VALUES (?,?,?,?,?)",
-                    plantacao.getMunicipio(), plantacao.getAno(), plantacao.getAreaPlantada(), plantacao.getQuantidadeColhida(), plantacao.getValorReais());
+            gerarNovaConeexao().update("INSERT INTO plantacaoMunicipioDash (fkMunicipio, ano, fkTipoCafe, areaPlantada, quantidadeColhida, valorTotalReais) VALUES (?,?,?,?,?,?)",
+                    plantacao.getMunicipio(), plantacao.getAno(), plantacao.getTipoCafe(), plantacao.getAreaPlantada(), plantacao.getQuantidadeColhida(), plantacao.getValorReais());
         }
     }
 
     public void inserirClimasNoBanco(List<Clima> climas) {
         for (Clima clima : climas) {
+            System.out.println(clima.toString());
             gerarNovaConeexao().update("INSERT INTO climaMunicipioDash (data, temperaturaMax, temperaturaMin, umidadeMedia) VALUES (?,?,?,?)",
                     clima.getDataMedicao(), clima.getMediaTemperaturaMaxima(), clima.getMediaTemperaturaMinima(), clima.getUmidadeAr());
         }

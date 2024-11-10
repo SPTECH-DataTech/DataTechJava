@@ -9,17 +9,19 @@ public class Clima {
     private Double mediaTemperaturaMinima;
     private Double mediaTemperaturaMaxima;
     private Double umidadeAr;
+    private String municipio;
 
 
     public Clima() {
 
     }
 
-    public Clima(String dataMedicao, Double mediaTemperaturaMinima, Double mediaTemperaturaMaxima, Double umidadeAr) {
+    public Clima(String dataMedicao, Double mediaTemperaturaMinima, Double mediaTemperaturaMaxima, Double umidadeAr, String municipio) {
         this.dataMedicao = dataMedicao;
         this.mediaTemperaturaMinima = mediaTemperaturaMinima;
         this.mediaTemperaturaMaxima = mediaTemperaturaMaxima;
         this.umidadeAr = umidadeAr;
+        this.municipio = municipio;
     }
 
     public String getDataMedicao() {
@@ -60,6 +62,14 @@ public class Clima {
 
     public void setUmidadeAr(Double umidadeAr) {
         this.umidadeAr = umidadeAr;
+    }
+
+    public String getMunicipio() {
+        return municipio;
+    }
+
+    public void setMunicipio(String municipio) {
+        this.municipio = municipio;
     }
 
     @Override

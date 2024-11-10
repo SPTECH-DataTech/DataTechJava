@@ -33,13 +33,13 @@ public class Application {
     }
 
     public List<Plantacao> lerArquivoPlantacoes() throws IOException {
-        String nomeArquivoPlantacoes = "download-basesbase-de-dados-para-tratar.xlsx";
+        String nomeArquivoPlantacoes = "download-basesdownload-basesbase-de-dados-para-tratar-com-tipo.xlsx";
 
         Path caminhoPlantacoes = Path.of(nomeArquivoPlantacoes);
         InputStream arquivoPlantacoes = Files.newInputStream(caminhoPlantacoes);
 
         Leitor leitor = new Leitor();
-        leitor.extrairPlantacao(nomeArquivoPlantacoes, arquivoPlantacoes);
+        List<Plantacao> plantacoes = leitor.extrairPlantacao(nomeArquivoPlantacoes, arquivoPlantacoes);
 
         arquivoPlantacoes.close();
 
@@ -47,23 +47,23 @@ public class Application {
         conectarComBanco().inserirLogNoBanco(logExtracaoBase);
         System.out.println("Plantações extraídas com sucesso");
 
-        return new ArrayList(leitor.extrairPlantacao(nomeArquivoPlantacoes, arquivoPlantacoes)) ;
+        return plantacoes;
     }
 
     public List<Clima> lerArquivoClima() throws IOException {
-        String nomeArquivoClima = "downloadsdados_83083_M_1985-01-01_1985-12-31.xlsx";
+        String nomeArquivoClima = "download-basesdados_83083_M_1985-01-01_1985-12-31.xlsx";
 
         Path caminhoClima = Path.of(nomeArquivoClima);
         InputStream arquivoClima = Files.newInputStream(caminhoClima);
 
         LeitorClima leitorClima = new LeitorClima();
-        leitorClima.extrairClimas(caminhoClima, arquivoClima);
+        List<Clima> climas = leitorClima.extrairClimas(caminhoClima, arquivoClima);
 
         Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "Climas registrados com sucesso");
         conectarComBanco().inserirLogNoBanco(logExtracaoBase);
         System.out.println("Climas registrados com sucesso");
 
-        return  new ArrayList(leitorClima.extrairClimas(caminhoClima, arquivoClima));
+        return climas;
     }
 
     public void inserirPlantacoesNoBanco(List<Plantacao> plantacoes) {

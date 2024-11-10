@@ -20,15 +20,17 @@ public class Main {
 
         //Leitura
 
+        List<Clima> climas= aplicacao.lerArquivoClima();
+
         List<Plantacao> plantacoes = aplicacao.lerArquivoPlantacoes();
 
-        List<Clima> climas= aplicacao.lerArquivoClima();
 
         /*====================================================================================*/
 
         //BD
+        aplicacao.inserirClimasNobanco(climas);
+
         aplicacao.inserirPlantacoesNoBanco(plantacoes);
 
-        aplicacao.inserirClimasNobanco(climas);
     }
 }
