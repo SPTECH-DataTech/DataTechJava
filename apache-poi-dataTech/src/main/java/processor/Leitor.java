@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 import writer.ConexaoBanco;
 
 import java.io.IOException;
@@ -47,7 +48,7 @@ public class Leitor {
                 if (row.getRowNum() == 0) {
                     System.out.println("\nLendo cabeçalho");
 
-                    for (int i = 0; i < 4; i++) {
+                    for (int i = 0; i < 5; i++) {
                         String coluna = row.getCell(i).getStringCellValue();
                         System.out.println("Coluna " + i + ": " + coluna);
                     }
@@ -64,6 +65,13 @@ public class Leitor {
                 plantacao.setQuantidadeColhida(row.getCell(3).getNumericCellValue());
                 plantacao.setAreaPlantada((int) row.getCell(4).getNumericCellValue());
                 plantacao.setValorReais((int) row.getCell(6).getNumericCellValue());
+
+                String tipoCafe = row.getCell(7).getStringCellValue();
+                if (tipoCafe.equals("arábica")) {
+                    plantacao.setTipoCafe(1);
+                } else {
+                    plantacao.setTipoCafe(2);
+                }
 
                 plantacoes.add(plantacao);
             }

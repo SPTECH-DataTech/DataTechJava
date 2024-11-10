@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class LeitorClima {
     public LeitorClima() {
     }
 
-    public List<Clima> extrairClimas(String nomeArquivo, InputStream arquivo) {
+    public List<Clima> extrairClimas(Path nomeArquivo, InputStream arquivo) {
         try {
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
 
@@ -22,7 +23,7 @@ public class LeitorClima {
             if (nomeArquivo.endsWith(".xlsx")) {
                 workbook = new XSSFWorkbook(arquivo);
             } else {
-                workbook = new HSSFWorkbook(arquivo);
+                workbook = new XSSFWorkbook(arquivo);
             }
 
             Sheet sheet = workbook.getSheetAt(0);
@@ -30,12 +31,19 @@ public class LeitorClima {
 
             // Iterando sobre as linhas da planilha
             for (Row row : sheet) {
+                Clima clima = new Clima();
+
                 if (row.getRowNum() < 11) {
 
                     System.out.println("\nLendo cabeçalho");
 
                     for (int i = 0; i < 4; i++) {
                         Cell cell = row.getCell(i);
+
+                        if (row.getRowNum() == 0) {
+                            clima.setMunicipio(row.getCell(0).getStringCellValue());
+                        }
+
                         if (cell != null && cell.getCellType() == CellType.STRING) {
                             String coluna = cell.getStringCellValue();
                             System.out.println("Coluna " + i + ": " + coluna);
@@ -49,7 +57,7 @@ public class LeitorClima {
                     continue;
 
                 }
-                Clima clima = new Clima();
+
 
 
                 Cell cellDataMedicao = row.getCell(0);
