@@ -5,6 +5,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import processor.Plantacao;
 import processor.clima.Clima;
+import processor.estadoMunicipio.EstadoMunicipio;
 
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
@@ -50,6 +51,14 @@ public class ConexaoBanco {
             System.out.println(clima.toString());
             gerarNovaConeexao().update("INSERT INTO climaMunicipioDash (data, temperaturaMax, temperaturaMin, umidadeMedia) VALUES (?,?,?,?)",
                     clima.getDataMedicao(), clima.getMediaTemperaturaMaxima(), clima.getMediaTemperaturaMinima(), clima.getUmidadeAr());
+        }
+    }
+
+    public void inserirEstadoMunicipioNoBanco(List<EstadoMunicipio> estadoMunicipios) {
+        for (EstadoMunicipio estadoMunicipio : estadoMunicipios) {
+            System.out.println(estadoMunicipio.toString());
+            gerarNovaConeexao().update("INSERT INTO estadoMunicipio (idUf, estado, idMunicipio, municipio) VALUES (?,?,?,?)",
+                    estadoMunicipio.getIdUf(), estadoMunicipio.getEstado(), estadoMunicipio.getIdMunicipio(), estadoMunicipio.getMunicipio());
         }
     }
 
