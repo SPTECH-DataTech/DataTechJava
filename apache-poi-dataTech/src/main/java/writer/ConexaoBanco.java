@@ -57,7 +57,7 @@ public class ConexaoBanco {
     public void inserirEstadoMunicipioNoBanco(List<EstadoMunicipio> estadoMunicipios) {
         for (EstadoMunicipio estadoMunicipio : estadoMunicipios) {
             System.out.println(estadoMunicipio.toString());
-            gerarNovaConeexao().update("INSERT INTO estadoMunicipio (idUf, estado, idMunicipio, municipio) VALUES (?,?,?,?)",
+            gerarNovaConeexao().update("INSERT IGNORE INTO estadoMunicipio (idUf, estado, idMunicipio, municipio) VALUES (?,?,?,?)",
                     estadoMunicipio.getIdUf(), estadoMunicipio.getEstado(), estadoMunicipio.getIdMunicipio(), estadoMunicipio.getMunicipio());
         }
     }

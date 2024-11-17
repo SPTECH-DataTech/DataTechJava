@@ -47,7 +47,7 @@ public class LeitorEstadoMunicipio {
             // Iterando sobre as linhas da planilha
             for (Row row : sheet) {
 
-                if (row.getRowNum() < 6) {
+                if (row.getRowNum() < 7) {
                     System.out.println("\nLendo cabeçalho");
 
                     for (int i = 0; i < 4; i++) {
