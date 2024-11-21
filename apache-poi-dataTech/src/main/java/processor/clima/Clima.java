@@ -4,6 +4,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+import static service.SlackService.errorSlack;
+
 public class Clima {
     private String dataMedicao;
     private Double mediaTemperaturaMinima;
@@ -31,6 +33,7 @@ public class Clima {
             return formatoSaida.format(formatoEntrada.parse(dataMedicao));
         } catch (Exception e) {
             System.err.println("Erro ao converter a data: " + dataMedicao);
+            errorSlack(e);
             return null;
         }
 

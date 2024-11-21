@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import static service.SlackService.errorSlack;
+
 public class LeitorClima {
 
     public LeitorClima() {
@@ -80,6 +82,7 @@ public class LeitorClima {
             System.out.println("\nLeitura do arquivo finalizada\n");
             return climasExtraidos;
         } catch (IOException e) {
+            errorSlack(e);
             throw new RuntimeException(e);
         }
     }
@@ -95,8 +98,10 @@ public class LeitorClima {
                 try {
                     return Double.parseDouble(cell.getStringCellValue().replace(",", "."));
                 } catch (NumberFormatException e) {
+                    errorSlack(e);
                     System.err.println("Erro ao converter para Double: " + e.getMessage());
-                    return 0.0;
+                    throw new Error("Erro ao converter para Double (Leitor Clima): " + e.getMessage(), e);
+                    // retutn 0.0;
                 }
             default:
                 return 0.0;

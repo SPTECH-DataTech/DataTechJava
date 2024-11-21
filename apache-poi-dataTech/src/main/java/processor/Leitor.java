@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import service.SlackService;
 import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 import writer.ConexaoBanco;
 
@@ -17,6 +18,8 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static service.SlackService.errorSlack;
 
 public class Leitor {
     String aplicacao = "Leitor";
@@ -90,7 +93,9 @@ public class Leitor {
             Log log = new Log(this.aplicacao + " ", LocalDateTime.now(), "Erro ao ler o arquivo" + e.getMessage());
             System.out.println("Erro ao ler o arquivo" + e.getMessage());
             conexao.inserirLogNoBanco(log);
+            errorSlack(e);
             throw new RuntimeException(e);
+
         }
     }
 
