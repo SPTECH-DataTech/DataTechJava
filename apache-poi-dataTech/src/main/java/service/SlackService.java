@@ -11,21 +11,26 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class SlackService {
     private static List<String> errorList = new ArrayList<>();
     private static final String TOKEN = System.getenv("TOKEN_SLACK");
     private static final String CHANNEL_ID = System.getenv("CHANNEL_ID");
- ;
 
-    public void sendMessage() {
+
+    public static void sendMessage() {
         try {
             Slack slack = Slack.getInstance();
             MethodsClient methods = slack.methods(TOKEN);
 
-            StringBuilder allErrors = new StringBuilder("Lista de erros registrados:\n");
+            StringBuilder allErrors = new StringBuilder("⚠️ ATENÃO - ERROS REGISTRADOS NO SISTEMA ⚠️");
             for (String error : errorList) {
-                allErrors.append("```\n").append(error).append("\n```\n");
+                allErrors.append("```\n")
+                        .append(error)
+                        .append("\n```\n\nObs: Verifique os logs registrados no Banco de Dados para maiores informações.");
             }
 
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
@@ -36,15 +41,13 @@ public class SlackService {
             ChatPostMessageResponse response = methods.chatPostMessage(request);
 
             if (response.isOk()) {
-                System.out.println("Mensagem enviada com sucesso!");
+                System.out.println("Notificação enviada com sucesso para o Slack!");
             } else {
-                System.err.println("Erro ao enviar mensagem: " + response.getError());
+                System.err.println("Erro ao enviar a notificação para o Slack!: " + response.getError());
             }
         } catch (SlackApiException | IOException e) {
             System.err.println("Erro durante a comunicação com a API do Slack: " + e.getMessage());
         }
-
-
 
     }
 
@@ -72,6 +75,8 @@ public class SlackService {
             );
 
             errorList.add(errorMessage);
+
+            System.out.println("Erro registrado (SLACK)");
     }
 
     public void listarErros(){
@@ -81,4 +86,7 @@ public class SlackService {
     public void limparListaErros(){
         errorList.clear();
     }
+
+
+
 }

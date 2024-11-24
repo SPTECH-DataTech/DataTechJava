@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static service.SlackService.errorSlack;
+import static service.SlackService.sendMessage;
 
 public class LeitorClima {
 
@@ -82,7 +83,7 @@ public class LeitorClima {
             System.out.println("\nLeitura do arquivo finalizada\n");
             return climasExtraidos;
         } catch (IOException e) {
-            errorSlack(e);
+
             throw new RuntimeException(e);
         }
     }

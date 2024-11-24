@@ -93,7 +93,7 @@ public class Leitor {
             Log log = new Log(this.aplicacao + " ", LocalDateTime.now(), "Erro ao ler o arquivo" + e.getMessage());
             System.out.println("Erro ao ler o arquivo" + e.getMessage());
             conexao.inserirLogNoBanco(log);
-            errorSlack(e);
+
             throw new RuntimeException(e);
 
         }
