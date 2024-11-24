@@ -1,39 +1,43 @@
+
 import client.S3Service;
 import processor.Plantacao;
 import processor.clima.Clima;
 import processor.estadoMunicipio.EstadoMunicipio;
 import service.SlackService;
 import writer.ConexaoBanco;
+
 import java.io.IOException;
 import java.util.List;
 
-import static service.SlackService.errorSlack;
+import static service.SlackService.sendMessage;
+
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
 
         Application aplicacao = new Application();
+
         ConexaoBanco conexaoBanco = aplicacao.conectarComBanco();
 
-        S3Service conexaoBucket = aplicacao.conectarComBucket();
+       S3Service conexaoBucket = aplicacao.conectarComBucket();
 
-        aplicacao.baixarArquivosS3(conexaoBucket);
+       aplicacao.baixarArquivosS3(conexaoBucket);
 
         //===================================================================================================================
 
         //Leitura
 
         List<EstadoMunicipio> estadosMunicipios = aplicacao.lerArquivoEstadoMunicipio();
+        sendMessage();
 
-        List<Clima> climas= aplicacao.lerArquivoClima();
+        List<Clima> climas = aplicacao.lerArquivoClima();
 
         List<Plantacao> plantacoes = aplicacao.lerArquivoPlantacoes();
 
         //====================================================================================
 
         //BD
-
         aplicacao.inserirEstadoMunicipioNoBanco(estadosMunicipios);
 
         aplicacao.inserirClimasNobanco(climas);
@@ -42,11 +46,8 @@ public class Main {
 
         //===================================================================================================================
 
-        // Slack
 
-        SlackService slackService = new SlackService();
 
-        slackService.sendMessage();
-        slackService.limparListaErros();
+
     }
 }

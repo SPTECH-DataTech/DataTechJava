@@ -7,6 +7,7 @@ import processor.clima.Clima;
 import processor.clima.LeitorClima;
 import processor.estadoMunicipio.EstadoMunicipio;
 import processor.estadoMunicipio.LeitorEstadoMunicipio;
+import service.SlackService;
 import writer.ConexaoBanco;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,9 +17,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static service.SlackService.errorSlack;
+
+
 public class Application {
     private List<Log> logs = new ArrayList<Log>();
     String aplicacao = "Main";
+
+
 
     public ConexaoBanco conectarComBanco(){
         return new ConexaoBanco();
@@ -36,34 +42,45 @@ public class Application {
 
     public List<Plantacao> lerArquivoPlantacoes() throws IOException {
         String nomeArquivoPlantacoes = "download-basesdownload-basesbase-de-dados-para-tratar-com-tipo.xlsx";
+        List<Plantacao> plantacoes = new ArrayList<>();
+        try {
+            Path caminhoPlantacoes = Path.of(nomeArquivoPlantacoes);
+            InputStream arquivoPlantacoes = Files.newInputStream(caminhoPlantacoes);
 
-        Path caminhoPlantacoes = Path.of(nomeArquivoPlantacoes);
-        InputStream arquivoPlantacoes = Files.newInputStream(caminhoPlantacoes);
+            Leitor leitor = new Leitor();
+            plantacoes = leitor.extrairPlantacao(nomeArquivoPlantacoes, arquivoPlantacoes);
 
-        Leitor leitor = new Leitor();
-        List<Plantacao> plantacoes = leitor.extrairPlantacao(nomeArquivoPlantacoes, arquivoPlantacoes);
+            arquivoPlantacoes.close();
 
-        arquivoPlantacoes.close();
-
-        Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "Plantações extraídas com sucesso");
-        conectarComBanco().inserirLogNoBanco(logExtracaoBase);
-        System.out.println("Plantações extraídas com sucesso");
-
+            Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "Plantações extraídas com sucesso");
+            conectarComBanco().inserirLogNoBanco(logExtracaoBase);
+            System.out.println("Plantações extraídas com sucesso");
+        } catch (Exception e) {
+            errorSlack(e);
+            throw new RuntimeException(e);
+        }
         return plantacoes;
     }
 
     public List<Clima> lerArquivoClima() throws IOException {
         String nomeArquivoClima = "download-basesdados_83083_M_1985-01-01_1985-12-31.xlsx";
+        List<Clima> climas = new ArrayList<>();
 
-        Path caminhoClima = Path.of(nomeArquivoClima);
-        InputStream arquivoClima = Files.newInputStream(caminhoClima);
+        try {
+            Path caminhoClima = Path.of(nomeArquivoClima);
+            InputStream arquivoClima = Files.newInputStream(caminhoClima);
 
-        LeitorClima leitorClima = new LeitorClima();
-        List<Clima> climas = leitorClima.extrairClimas(caminhoClima, arquivoClima);
+            LeitorClima leitorClima = new LeitorClima();
+            climas = leitorClima.extrairClimas(caminhoClima, arquivoClima);
 
-        Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "Climas registrados com sucesso");
-        conectarComBanco().inserirLogNoBanco(logExtracaoBase);
-        System.out.println("Climas registrados com sucesso");
+            Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "Climas registrados com sucesso");
+            conectarComBanco().inserirLogNoBanco(logExtracaoBase);
+            System.out.println("Climas registrados com sucesso");
+
+        } catch (Exception e) {
+            errorSlack(e);
+            throw new RuntimeException(e);
+        }
 
         return climas;
     }
@@ -71,16 +88,21 @@ public class Application {
     public List<EstadoMunicipio> lerArquivoEstadoMunicipio() throws IOException {
         String nomeArquivoEstadoMunicipio = "Base-de-Dados-Municipios-_Editada_.xlsx";
 
-        Path caminhoEstadoMunicipio = Path.of(nomeArquivoEstadoMunicipio);
-        InputStream arquivoEstadoMunicipio = Files.newInputStream(caminhoEstadoMunicipio);
+        List<EstadoMunicipio> estadoMunicipios = new ArrayList<>();
+        try {
+            Path caminhoEstadoMunicipio = Path.of(nomeArquivoEstadoMunicipio);
+            InputStream arquivoEstadoMunicipio = Files.newInputStream(caminhoEstadoMunicipio);
 
-        LeitorEstadoMunicipio leitorEstadoMunicipio = new LeitorEstadoMunicipio();
-        List<EstadoMunicipio> estadoMunicipios = leitorEstadoMunicipio.extrairEstadoMunicipio(caminhoEstadoMunicipio, arquivoEstadoMunicipio);
+            LeitorEstadoMunicipio leitorEstadoMunicipio = new LeitorEstadoMunicipio();
+            estadoMunicipios = leitorEstadoMunicipio.extrairEstadoMunicipio(caminhoEstadoMunicipio, arquivoEstadoMunicipio);
 
-        Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "EstadoMunicipios registrados com sucesso");
-        conectarComBanco().inserirLogNoBanco(logExtracaoBase);
-        System.out.println("EstadoMunicipios registrados com sucesso");
-
+            Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "EstadoMunicipios registrados com sucesso");
+            conectarComBanco().inserirLogNoBanco(logExtracaoBase);
+            System.out.println("EstadoMunicipios registrados com sucesso");
+        } catch (Exception e) {
+            System.err.println("Erro inesperado em ler EstadoMunicipios: " + e.getMessage());
+            errorSlack(e);
+        }
         return estadoMunicipios;
     }
 
