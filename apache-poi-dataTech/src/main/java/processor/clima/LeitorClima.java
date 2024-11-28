@@ -1,22 +1,25 @@
 package processor.clima;
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import processor.LeitorArquivos;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static service.SlackService.errorSlack;
 
-public class LeitorClima {
+public class LeitorClima extends LeitorArquivos {
 
-    public LeitorClima() {
-    }
+    public LeitorClima() {}
 
-    public List<Clima> extrairClimas(Path nomeArquivo, InputStream arquivo) {
+    @Override
+    public List<Clima> extrairDados(String nomeArquivo, InputStream arquivo) {
         try {
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
 

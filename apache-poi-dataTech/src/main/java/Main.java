@@ -1,13 +1,11 @@
 import client.S3Service;
-import processor.Plantacao;
+import processor.plantacao.Plantacao;
 import processor.clima.Clima;
 import processor.estadoMunicipio.EstadoMunicipio;
 import service.SlackService;
 import writer.ConexaoBanco;
 import java.io.IOException;
 import java.util.List;
-
-import static service.SlackService.errorSlack;
 
 public class Main {
 

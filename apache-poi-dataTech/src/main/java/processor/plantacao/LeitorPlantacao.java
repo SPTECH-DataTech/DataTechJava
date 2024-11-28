@@ -1,4 +1,4 @@
-package processor;
+package processor.plantacao;
 
 import datatech.log.Log;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -6,9 +6,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import service.SlackService;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value;
-import writer.ConexaoBanco;
+import processor.LeitorArquivos;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,17 +19,17 @@ import java.util.List;
 
 import static service.SlackService.errorSlack;
 
-public class Leitor {
+public class LeitorPlantacao extends LeitorArquivos {
     String aplicacao = "Leitor";
-    ConexaoBanco conexao = new ConexaoBanco();
 
-    public Leitor() {}
+    public LeitorPlantacao() {}
 
-    public List<Plantacao> extrairPlantacao(String nomeArquivo, InputStream arquivo) {
+    @Override
+    public List extrairDados(String nomeArquivo, InputStream arquivo) {
         try {
             Log logInicioLeitura = new Log(this.aplicacao + " ", LocalDateTime.now(), " Iniciando leitura do arquivo %s\n".formatted(nomeArquivo));
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
-            conexao.inserirLogNoBanco(logInicioLeitura);
+            getConexao().inserirLogNoBanco(logInicioLeitura);
 
             // Criando um objeto Workbook a partir do arquivo recebido
             Workbook workbook;
@@ -84,7 +82,7 @@ public class Leitor {
 
             Log logFimLeitura = new Log(this.aplicacao + " ", LocalDateTime.now(), " Leitura do arquivo finalizada");
             System.out.println("\nLeitura do arquivo finalizada\n");
-            conexao.inserirLogNoBanco(logFimLeitura);
+            getConexao().inserirLogNoBanco(logFimLeitura);
 
             return plantacoes;
 
@@ -92,14 +90,14 @@ public class Leitor {
             // Caso ocorra algum erro durante a leitura do arquivo uma exceção será lançada
             Log log = new Log(this.aplicacao + " ", LocalDateTime.now(), "Erro ao ler o arquivo" + e.getMessage());
             System.out.println("Erro ao ler o arquivo" + e.getMessage());
-            conexao.inserirLogNoBanco(log);
+            getConexao().inserirLogNoBanco(log);
             errorSlack(e);
             throw new RuntimeException(e);
 
         }
     }
 
-    private LocalDate converterDate(Date data) {
+    public LocalDate converterDate(Date data) {
         return data.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
 

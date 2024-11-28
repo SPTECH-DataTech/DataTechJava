@@ -1,13 +1,14 @@
 import client.S3Provider;
 import client.S3Service;
 import datatech.log.Log;
-import processor.Leitor;
-import processor.Plantacao;
+import processor.plantacao.LeitorPlantacao;
+import processor.plantacao.Plantacao;
 import processor.clima.Clima;
 import processor.clima.LeitorClima;
 import processor.estadoMunicipio.EstadoMunicipio;
 import processor.estadoMunicipio.LeitorEstadoMunicipio;
 import writer.ConexaoBanco;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -20,7 +21,7 @@ public class Application {
     private List<Log> logs = new ArrayList<Log>();
     String aplicacao = "Main";
 
-    public ConexaoBanco conectarComBanco(){
+    public ConexaoBanco conectarComBanco() {
         return new ConexaoBanco();
     }
 
@@ -40,8 +41,9 @@ public class Application {
         Path caminhoPlantacoes = Path.of(nomeArquivoPlantacoes);
         InputStream arquivoPlantacoes = Files.newInputStream(caminhoPlantacoes);
 
-        Leitor leitor = new Leitor();
-        List<Plantacao> plantacoes = leitor.extrairPlantacao(nomeArquivoPlantacoes, arquivoPlantacoes);
+        LeitorPlantacao leitorPlantacao = new LeitorPlantacao();
+
+        List<Plantacao> plantacoes = leitorPlantacao.extrairDados(nomeArquivoPlantacoes, arquivoPlantacoes);
 
         arquivoPlantacoes.close();
 
@@ -59,7 +61,7 @@ public class Application {
         InputStream arquivoClima = Files.newInputStream(caminhoClima);
 
         LeitorClima leitorClima = new LeitorClima();
-        List<Clima> climas = leitorClima.extrairClimas(caminhoClima, arquivoClima);
+        List<Clima> climas = leitorClima.extrairDados(caminhoClima, arquivoClima);
 
         Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "Climas registrados com sucesso");
         conectarComBanco().inserirLogNoBanco(logExtracaoBase);
@@ -75,7 +77,7 @@ public class Application {
         InputStream arquivoEstadoMunicipio = Files.newInputStream(caminhoEstadoMunicipio);
 
         LeitorEstadoMunicipio leitorEstadoMunicipio = new LeitorEstadoMunicipio();
-        List<EstadoMunicipio> estadoMunicipios = leitorEstadoMunicipio.extrairEstadoMunicipio(caminhoEstadoMunicipio, arquivoEstadoMunicipio);
+        List<EstadoMunicipio> estadoMunicipios = leitorEstadoMunicipio.extrairDados(caminhoEstadoMunicipio, arquivoEstadoMunicipio);
 
         Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "EstadoMunicipios registrados com sucesso");
         conectarComBanco().inserirLogNoBanco(logExtracaoBase);

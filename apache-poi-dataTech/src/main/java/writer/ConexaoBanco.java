@@ -3,12 +3,11 @@ package writer;
 import datatech.log.Log;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
-import processor.Plantacao;
+import processor.plantacao.Plantacao;
 import processor.clima.Clima;
 import processor.estadoMunicipio.EstadoMunicipio;
 
 import javax.sql.DataSource;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class ConexaoBanco {
