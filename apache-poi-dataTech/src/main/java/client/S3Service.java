@@ -89,8 +89,8 @@ public class S3Service {
             conexao.inserirLogNoBanco(log);
 
         } catch (S3Exception e) {
-            Log log = new Log(this.aplicacao + " ", LocalDateTime.now(), " Erro ao listar objetos no bucket: " + e.getMessage());
-            System.err.println(" Erro ao listar objetos no bucket: " + e.getMessage());
+            Log log = new Log(this.aplicacao + " ", LocalDateTime.now(), " Erro ao listar objetos no bucket ");
+            System.err.println(" Erro ao listar objetos no bucket");
             conexao.inserirLogNoBanco(log);
         }
     }
@@ -114,8 +114,8 @@ public class S3Service {
                 conexao.inserirLogNoBanco(log);
             }
         } catch (IOException | S3Exception e) {
-            Log log = new Log(this.aplicacao + " ", LocalDateTime.now(), " Erro ao fazer download dos arquivos: " + e.getMessage());
-            System.err.println("Erro ao fazer download dos arquivos: " + e.getMessage());
+            Log log = new Log(this.aplicacao + " ", LocalDateTime.now(), " Erro ao fazer download dos arquivos");
+            System.err.println("Erro ao fazer download dos arquivos");
             conexao.inserirLogNoBanco(log);
         }
     }

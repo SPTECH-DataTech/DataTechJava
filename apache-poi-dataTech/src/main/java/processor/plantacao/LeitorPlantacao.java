@@ -10,6 +10,7 @@ import processor.LeitorArquivos;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -20,12 +21,12 @@ import java.util.List;
 import static service.SlackService.errorSlack;
 
 public class LeitorPlantacao extends LeitorArquivos {
-    String aplicacao = "Leitor";
+    String aplicacao = "LeitorPlantacao";
 
     public LeitorPlantacao() {}
 
     @Override
-    public List extrairDados(String nomeArquivo, InputStream arquivo) {
+    public List<Plantacao> extrairDados(Path nomeArquivo, InputStream arquivo) {
         try {
             Log logInicioLeitura = new Log(this.aplicacao + " ", LocalDateTime.now(), " Iniciando leitura do arquivo %s\n".formatted(nomeArquivo));
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));

@@ -43,7 +43,7 @@ public class Application {
 
         LeitorPlantacao leitorPlantacao = new LeitorPlantacao();
 
-        List<Plantacao> plantacoes = leitorPlantacao.extrairDados(nomeArquivoPlantacoes, arquivoPlantacoes);
+        List<Plantacao> plantacoes = leitorPlantacao.extrairDados(caminhoPlantacoes, arquivoPlantacoes);
 
         arquivoPlantacoes.close();
 

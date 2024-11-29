@@ -16,10 +16,12 @@ import static service.SlackService.errorSlack;
 
 public class LeitorClima extends LeitorArquivos {
 
+    String aplicacao = "LeitorClima";
+
     public LeitorClima() {}
 
     @Override
-    public List<Clima> extrairDados(String nomeArquivo, InputStream arquivo) {
+    public List<Clima> extrairDados(Path nomeArquivo, InputStream arquivo) {
         try {
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
 

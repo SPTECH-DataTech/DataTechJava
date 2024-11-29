@@ -35,7 +35,7 @@ public class ConexaoBanco {
 
     public void inserirLogNoBanco(Log log){
         System.out.println(log.getData().toString() + log.getAplicacao() + log.getDescricao());
-        gerarNovaConeexao().update("INSERT INTO logsjava (descricao) VALUES (?)",log.getData().toString() + " " + log.getAplicacao() + " " + log.getDescricao());
+        gerarNovaConeexao().update("INSERT INTO logJava (descricao) VALUES (?)",log.getData().toString() + " " + log.getAplicacao() + " " + log.getDescricao());
     }
 
     public void inserirPlantacoesNoBanco(List<Plantacao> plantacoes) {

@@ -26,7 +26,7 @@ public class LeitorEstadoMunicipio extends LeitorArquivos {
     }
 
     @Override
-    public List<EstadoMunicipio> extrairDados(String nomeArquivo, InputStream arquivo) {
+    public List<EstadoMunicipio> extrairDados(Path nomeArquivo, InputStream arquivo) {
         try {
             Log logInicioLeitura = new Log(this.aplicacao + " ", LocalDateTime.now(), " Iniciando leitura do arquivo %s\n".formatted(nomeArquivo));
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
