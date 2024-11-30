@@ -30,7 +30,7 @@ public class LeitorEstadoMunicipio {
         try {
             Log logInicioLeitura = new Log(this.aplicacao + " ", LocalDateTime.now(), " Iniciando leitura do arquivo %s\n".formatted(nomeArquivo));
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
-            conexao.inserirLogNoBanco(logInicioLeitura);
+            // conexao.inserirLogNoBanco(logInicioLeitura);
 
             // Criando um objeto Workbook a partir do arquivo recebido
             Workbook workbook;
@@ -47,13 +47,13 @@ public class LeitorEstadoMunicipio {
             // Iterando sobre as linhas da planilha
             for (Row row : sheet) {
 
-                if (row.getRowNum() < 7) {
+                if (row.getRowNum() < 6) {
                     System.out.println("\nLendo cabeçalho");
 
-                    for (int i = 0; i < 4; i++) {
+                    /*for (int i = 0; i < 4; i++) {
                         String coluna = row.getCell(i).getStringCellValue();
                         System.out.println("Coluna " + i + ": " + coluna);
-                    }
+                    }*/
 
                     System.out.println("--------------------");
                     continue;
@@ -62,9 +62,9 @@ public class LeitorEstadoMunicipio {
                 // Extraindo valor das células e criando objeto plantação
 
                 EstadoMunicipio estadoMunicipio = new EstadoMunicipio();
-                estadoMunicipio.setIdUf((int) row.getCell(0).getNumericCellValue());
+                estadoMunicipio.setIdUf((int)row.getCell(0).getNumericCellValue());
                 estadoMunicipio.setEstado(row.getCell(1).getStringCellValue());
-                estadoMunicipio.setIdMunicipio((int) row.getCell(2).getNumericCellValue());
+                estadoMunicipio.setIdMunicipio((int)row.getCell(2).getNumericCellValue());
                 estadoMunicipio.setMunicipio(row.getCell(3).getStringCellValue());
 
                 estadoMunicipios.add(estadoMunicipio);
@@ -75,7 +75,7 @@ public class LeitorEstadoMunicipio {
 
             Log logFimLeitura = new Log(this.aplicacao + " ", LocalDateTime.now(), " Leitura do arquivo finalizada");
             System.out.println("\nLeitura do arquivo finalizada\n");
-            conexao.inserirLogNoBanco(logFimLeitura);
+            //conexao.inserirLogNoBanco(logFimLeitura);
 
             return estadoMunicipios;
 
@@ -83,7 +83,7 @@ public class LeitorEstadoMunicipio {
             // Caso ocorra algum erro durante a leitura do arquivo uma exceção será lançada
             Log log = new Log(this.aplicacao + " ", LocalDateTime.now(), "Erro ao ler o arquivo" + e.getMessage());
             System.out.println("Erro ao ler o arquivo" + e.getMessage());
-            conexao.inserirLogNoBanco(log);
+            // conexao.inserirLogNoBanco(log);
             throw new RuntimeException(e);
         }
     }
