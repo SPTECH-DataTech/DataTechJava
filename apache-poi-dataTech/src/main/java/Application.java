@@ -1,6 +1,7 @@
 import client.S3Provider;
 import client.S3Service;
 import datatech.log.Log;
+import org.springframework.jdbc.core.JdbcTemplate;
 import processor.Leitor;
 import processor.Plantacao;
 import processor.clima.Clima;
@@ -13,9 +14,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static service.SlackService.errorSlack;
 
@@ -40,26 +43,36 @@ public class Application {
         conexaoBucket.downloadFiles();
     }
 
-    public List<Plantacao> lerArquivoPlantacoes() throws IOException {
-        String nomeArquivoPlantacoes = "download-basesdownload-basesbase-de-dados-para-tratar-com-tipo.xlsx";
-        List<Plantacao> plantacoes = new ArrayList<>();
-        try {
-            Path caminhoPlantacoes = Path.of(nomeArquivoPlantacoes);
-            InputStream arquivoPlantacoes = Files.newInputStream(caminhoPlantacoes);
+    public List<Plantacao> lerArquivoPlantacoes(JdbcTemplate conexao) throws IOException {
+        String directory = "downloaded-bases/";
+        // Lista os arquivos na pasta de downloads
+        Stream<Path> files = Files.list(Paths.get(directory));
 
-            Leitor leitor = new Leitor();
-            plantacoes = leitor.extrairPlantacao(nomeArquivoPlantacoes, arquivoPlantacoes);
+        // Filtra os arquivos removendo pastas e só pegando arquivos .xlsx e que começam com
+        // "plantacao"
+        Stream<Path> arquivosPlantacao = files.filter(
+                file -> !Files.isDirectory(file)
+                       && file.getFileName().toString().toLowerCase().endsWith(".xlsx")
+                       && file.getFileName().toString().toLowerCase().startsWith("plantacao")
+        );
 
-            arquivoPlantacoes.close();
+        // Converte a stream para lista (não dá pra fazer foreach em Stream)
+        List<Path> plantacaoList = arquivosPlantacao.toList();
 
-            Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "Plantações extraídas com sucesso");
-            conectarComBanco().inserirLogNoBanco(logExtracaoBase);
-            System.out.println("Plantações extraídas com sucesso");
-        } catch (Exception e) {
-            errorSlack(e);
-            throw new RuntimeException(e);
+        for (Path arquivoPlantacao: plantacaoList) {
+            try (InputStream arquivoPlantacoes = Files.newInputStream(arquivoPlantacao)) {
+                Leitor leitor = new Leitor();
+                List<Plantacao> plantacoes = leitor.extrairPlantacao(arquivoPlantacao.getFileName().toString(), arquivoPlantacoes, conexao);
+
+                Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "Plantações extraídas com sucesso");
+                // conectarComBanco().inserirLogNoBanco(logExtracaoBase);
+                System.out.println("Plantações extraídas com sucesso");
+
+                return plantacoes;
+            }
         }
-        return plantacoes;
+
+        return null;
     }
 
     public List<Clima> lerArquivoClima() throws IOException {
@@ -77,6 +90,9 @@ public class Application {
             conectarComBanco().inserirLogNoBanco(logExtracaoBase);
             System.out.println("Climas registrados com sucesso");
 
+        Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "Climas registrados com sucesso");
+        // conectarComBanco().inserirLogNoBanco(logExtracaoBase);
+        System.out.println("Climas registrados com sucesso");
         } catch (Exception e) {
             errorSlack(e);
             throw new RuntimeException(e);
@@ -86,12 +102,16 @@ public class Application {
     }
 
     public List<EstadoMunicipio> lerArquivoEstadoMunicipio() throws IOException {
-        String nomeArquivoEstadoMunicipio = "Base-de-Dados-Municipios-_Editada_.xlsx";
+        String nomeArquivoEstadoMunicipio = "downloaded-bases/Base-de-Dados-Municipios-_Editada_.xlsx";
 
         List<EstadoMunicipio> estadoMunicipios = new ArrayList<>();
         try {
             Path caminhoEstadoMunicipio = Path.of(nomeArquivoEstadoMunicipio);
             InputStream arquivoEstadoMunicipio = Files.newInputStream(caminhoEstadoMunicipio);
+
+        Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "EstadoMunicipios registrados com sucesso");
+        // conectarComBanco().inserirLogNoBanco(logExtracaoBase);
+        System.out.println("EstadoMunicipios registrados com sucesso");
 
             LeitorEstadoMunicipio leitorEstadoMunicipio = new LeitorEstadoMunicipio();
             estadoMunicipios = leitorEstadoMunicipio.extrairEstadoMunicipio(caminhoEstadoMunicipio, arquivoEstadoMunicipio);
@@ -108,51 +128,51 @@ public class Application {
 
     public void inserirPlantacoesNoBanco(List<Plantacao> plantacoes) {
         Log logInsercaoBanco = new Log(aplicacao, LocalDateTime.now(), "Inserindo dados de plantações lidos no Banco de dados...");
-        conectarComBanco().inserirLogNoBanco(logInsercaoBanco);
+        // conectarComBanco().inserirLogNoBanco(logInsercaoBanco);
         System.out.println("Inserindo dados de plantações lidos no Banco de dados...");
 
         try {
             conectarComBanco().inserirPlantacoesNoBanco(plantacoes);
             Log logSucesso = new Log(aplicacao + " ", LocalDateTime.now(), " Plantações inseridas com sucesso no banco de dados");
-            conectarComBanco().inserirLogNoBanco(logSucesso);
+            // conectarComBanco().inserirLogNoBanco(logSucesso);
             System.out.println("Inserções encerradas");
         } catch (Exception e) {
             Log logFalha = new Log(aplicacao + " ", LocalDateTime.now(), "Falha ao inserir plantações no banco de dados");
-            conectarComBanco().inserirLogNoBanco(logFalha);
+            // conectarComBanco().inserirLogNoBanco(logFalha);
             throw e;
         }
     }
 
     public void inserirClimasNobanco(List<Clima> climas) {
         Log log = new Log(aplicacao, LocalDateTime.now(), "Inserindo dados de clima lidos no Banco de dados...");
-        conectarComBanco().inserirLogNoBanco(log);
+        // conectarComBanco().inserirLogNoBanco(log);
         System.out.println("Inserindo dados de clima lidos no Banco de dados...");
 
         try {
             conectarComBanco().inserirClimasNoBanco(climas);
             Log logSucesso = new Log(aplicacao + " ", LocalDateTime.now(), "Climas inseridos com sucesso no banco de dados");
             System.out.println("Climas inseridos com sucesso no banco de dados");
-            conectarComBanco().inserirLogNoBanco(logSucesso);
+            // conectarComBanco().inserirLogNoBanco(logSucesso);
         } catch (Exception e) {
             Log logFalha = new Log(aplicacao + " ", LocalDateTime.now(), "Falha ao inserir climas no banco de dados");
-            conectarComBanco().inserirLogNoBanco(logFalha);
+            // conectarComBanco().inserirLogNoBanco(logFalha);
             throw e;
         }
     }
 
     public void inserirEstadoMunicipioNoBanco(List<EstadoMunicipio> estadoMunicipios) {
         Log log = new Log(aplicacao, LocalDateTime.now(), "Inserindo dados de EstadoMunicipios lidos no Banco de dados...");
-        conectarComBanco().inserirLogNoBanco(log);
+        // conectarComBanco().inserirLogNoBanco(log);
         System.out.println("Inserindo dados de EstadoMunicipios lidos no Banco de dados...");
 
         try {
             conectarComBanco().inserirEstadoMunicipioNoBanco(estadoMunicipios);
             Log logSucesso = new Log(aplicacao + " ", LocalDateTime.now(), "EstadoMunicipios inseridos com sucesso no banco de dados");
             System.out.println("EstadoMunicipios inseridos com sucesso no banco de dados");
-            conectarComBanco().inserirLogNoBanco(logSucesso);
+            // conectarComBanco().inserirLogNoBanco(logSucesso);
         } catch (Exception e) {
             Log logFalha = new Log(aplicacao + " ", LocalDateTime.now(), "Falha ao inserir EstadoMunicipios no banco de dados");
-            conectarComBanco().inserirLogNoBanco(logFalha);
+            // conectarComBanco().inserirLogNoBanco(logFalha);
             throw e;
         }
     }

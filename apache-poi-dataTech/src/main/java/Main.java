@@ -1,5 +1,6 @@
 
 import client.S3Service;
+import org.springframework.jdbc.core.JdbcTemplate;
 import processor.Plantacao;
 import processor.clima.Clima;
 import processor.estadoMunicipio.EstadoMunicipio;
@@ -19,6 +20,7 @@ public class Main {
         Application aplicacao = new Application();
 
         ConexaoBanco conexaoBanco = aplicacao.conectarComBanco();
+        JdbcTemplate conexao  = conexaoBanco.getConnection();
 
        S3Service conexaoBucket = aplicacao.conectarComBucket();
 
@@ -28,6 +30,11 @@ public class Main {
 
         //Leitura
 
+        // List<EstadoMunicipio> estadosMunicipios = aplicacao.lerArquivoEstadoMunicipio();
+
+        // List<Clima> climas= aplicacao.lerArquivoClima();
+        List<Plantacao> plantacoes = aplicacao.lerArquivoPlantacoes(conexao);
+
         List<EstadoMunicipio> estadosMunicipios = aplicacao.lerArquivoEstadoMunicipio();
         sendMessage();
 
@@ -35,12 +42,16 @@ public class Main {
 
         List<Plantacao> plantacoes = aplicacao.lerArquivoPlantacoes();
 
+
         //====================================================================================
 
         //BD
+
+        // aplicacao.inserirEstadoMunicipioNoBanco(estadosMunicipios);
+
         aplicacao.inserirEstadoMunicipioNoBanco(estadosMunicipios);
 
-        aplicacao.inserirClimasNobanco(climas);
+        // aplicacao.inserirClimasNobanco(climas);
 
         aplicacao.inserirPlantacoesNoBanco(plantacoes);
 

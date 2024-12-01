@@ -9,6 +9,7 @@ import processor.estadoMunicipio.EstadoMunicipio;
 
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ConexaoBanco {
@@ -16,6 +17,8 @@ public class ConexaoBanco {
     private final DataSource dataSource;
 
     private String aplicacao = "Conexao-banco";
+
+    private JdbcTemplate singletonJdbcTemplate;
 
     public ConexaoBanco() {
         BasicDataSource basicDataSource = new BasicDataSource();
@@ -27,43 +30,66 @@ public class ConexaoBanco {
         this.dataSource = basicDataSource;
     }
 
-    public JdbcTemplate gerarNovaConeexao() {
-        ConexaoBanco conexaoBanco = new ConexaoBanco();
-        JdbcTemplate connection = conexaoBanco.getConnection();
+    public JdbcTemplate getConnection() {
+        if(singletonJdbcTemplate == null) {
+            this.singletonJdbcTemplate = new JdbcTemplate(dataSource);
+        }
 
-        return connection;
+        return this.singletonJdbcTemplate;
     }
 
-    public void inserirLogNoBanco(Log log){
+
+    //    public JdbcTemplate gerarNovaConeexao() {
+//        ConexaoBanco conexaoBanco = new ConexaoBanco();
+//        JdbcTemplate connection = conexaoBanco.getConnection();
+//
+//        return connection;
+//    }
+
+  /*  public void inserirLogNoBanco(Log log){
         System.out.println(log.getData().toString() + log.getAplicacao() + log.getDescricao());
-        gerarNovaConeexao().update("INSERT INTO logsjava (descricao) VALUES (?)",log.getData().toString() + " " + log.getAplicacao() + " " + log.getDescricao());
-    }
+        gerarNovaConeexao().update("INSERT INTO logJava (descricao) VALUES (?)",log.getData().toString() + " " + log.getAplicacao() + " " + log.getDescricao());
+    }*/
 
-    public void inserirPlantacoesNoBanco(List<Plantacao> plantacoes) {
+    /*public void inserirPlantacoesNoBanco(List<Plantacao> plantacoes) {
+        JdbcTemplate conexao = getConnection();
+
         for (Plantacao plantacao : plantacoes) {
-            gerarNovaConeexao().update("INSERT INTO plantacaoMunicipioDash (fkMunicipio, ano, fkTipoCafe, areaPlantada, quantidadeColhida, valorTotalReais) VALUES (?,?,?,?,?,?)",
+            conexao.update("INSERT INTO plantacaoMunicipioDash (fkMunicipio, ano, fkTipoCafe, areaPlantada, quantidadeColhida, valorTotalReais) VALUES (?,?,?,?,?,?)",
                     plantacao.getMunicipio(), plantacao.getAno(), plantacao.getTipoCafe(), plantacao.getAreaPlantada(), plantacao.getQuantidadeColhida(), plantacao.getValorReais());
         }
+    }*/
+
+    public void inserirPlantacoesNoBanco(List<Plantacao> plantacoes) {
+        JdbcTemplate conexao = getConnection();
+
+        List<String> queries = new ArrayList<>();
+        for (Plantacao plantacao : plantacoes) {
+            // System.out.println(estadoMunicipio.toString());
+            queries.add(String.format("INSERT INTO plantacaoFazenda (fkFazenda, fazenda_fkEmpresa, fazenda_fkEstadoMunicipio, ano, areaPlantada, quantidadeColhida, valorTotalReais) VALUES (%d, %d, %d, %d, %s, %s, %s);",
+                    plantacao.getFkFazenda(), plantacao.getFazenda_fkEmpresa(), plantacao.getFazenda_fkEstadoMunicipio(), plantacao.getAno(), plantacao.getAreaPlantada().toString().replace(",", "."), plantacao.getQuantidadeColhida().toString().replace(",", "."), plantacao.getValorReais().toString().replace(",", ".")));
+        }
+
+        conexao.batchUpdate(queries.toArray(new String[0]));
     }
 
     public void inserirClimasNoBanco(List<Clima> climas) {
         for (Clima clima : climas) {
             System.out.println(clima.toString());
-            gerarNovaConeexao().update("INSERT INTO climaMunicipioDash (data, temperaturaMax, temperaturaMin, umidadeMedia) VALUES (?,?,?,?)",
+            getConnection().update("INSERT INTO climaMunicipioDash (data, temperaturaMax, temperaturaMin, umidadeMedia) VALUES (?,?,?,?)",
                     clima.getDataMedicao(), clima.getMediaTemperaturaMaxima(), clima.getMediaTemperaturaMinima(), clima.getUmidadeAr());
         }
     }
 
     public void inserirEstadoMunicipioNoBanco(List<EstadoMunicipio> estadoMunicipios) {
+        JdbcTemplate conexao = getConnection();
+        List<String> queries = new ArrayList<>();
         for (EstadoMunicipio estadoMunicipio : estadoMunicipios) {
             System.out.println(estadoMunicipio.toString());
-            gerarNovaConeexao().update("INSERT IGNORE INTO estadoMunicipio (idUf, estado, idMunicipio, municipio) VALUES (?,?,?,?)",
-                    estadoMunicipio.getIdUf(), estadoMunicipio.getEstado(), estadoMunicipio.getIdMunicipio(), estadoMunicipio.getMunicipio());
+            queries.add(String.format("INSERT IGNORE INTO estadoMunicipio(id, idUf, estado, municipio) VALUES (%d,%d,\"%s\",\"%s\")",
+                    estadoMunicipio.getIdMunicipio(), estadoMunicipio.getIdUf(), estadoMunicipio.getEstado(),  estadoMunicipio.getMunicipio()));
         }
-    }
 
-    public JdbcTemplate getConnection() {
-        return new JdbcTemplate(dataSource);
+        conexao.batchUpdate(queries.toArray(new String[0]));
     }
-
 }
