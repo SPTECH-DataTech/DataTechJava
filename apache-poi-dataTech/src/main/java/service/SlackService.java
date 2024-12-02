@@ -26,11 +26,18 @@ public class SlackService {
             MethodsClient methods = slack.methods(TOKEN);
 
             StringBuilder allErrors = new StringBuilder("⚠️ ATENÃO - ERROS REGISTRADOS NO SISTEMA ⚠️");
-            for (String error : errorList) {
-                allErrors.append("```\n")
-                        .append(error)
-                        .append("\n```\n\nObs: Verifique os logs registrados no Banco de Dados para maiores informações.");
+            if (!errorList.isEmpty()) {
+                for (String error : errorList) {
+                    allErrors.append("```\n")
+                            .append(error)
+                            .append("\n```\n");
+                }
+            } else {
+                allErrors.append("\n\nNenhum erro registrado no sistema.\n");
             }
+            allErrors.append("\nResumo de operações:\n")
+                    .append("✅ Operações bem-sucedidas: ").append(OperationsCounter.getSuccess()).append("\n")
+                    .append("❌ Operações com falha: ").append(OperationsCounter.getFailed()).append("\n");
 
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
                     .channel(CHANNEL_ID)

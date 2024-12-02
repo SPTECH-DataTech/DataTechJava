@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static service.OperationsCounter.registerFalied;
+import static service.OperationsCounter.registerSuccess;
 import static service.SlackService.errorSlack;
 
 
@@ -34,17 +36,35 @@ public class Application {
     }
 
     public S3Service conectarComBucket() {
-        String bucketName = "bucket-data-tech";
-        return new S3Service(new S3Provider().getS3Client(), bucketName);
+        try {
+            String bucketName = "bucket-data-tech";
+            System.out.println("Conectando ao bucket: " + bucketName);
+            registerSuccess();
+            return new S3Service(new S3Provider().getS3Client(), bucketName);
+        } catch (Exception e) {
+            System.out.println("Houve um erro ao conectar com bucket S3: " + e.getMessage());
+            registerFalied();
+            errorSlack(e);
+            throw new RuntimeException(e);
+        }
     }
 
     public void baixarArquivosS3(S3Service conexaoBucket) {
-        conexaoBucket.listObjects();
-        conexaoBucket.downloadFiles();
+     try {
+         System.out.println("Baixando arquivos em S3...");
+         conexaoBucket.listObjects();
+         conexaoBucket.downloadFiles();
+         registerSuccess();
+     } catch (Exception e) {
+         System.err.println("Houve um erro ao baixar os arquivos do bucket S3" + e.getMessage());
+         errorSlack(e);
+         registerFalied();
+         throw new RuntimeException(e);
+     }
     }
 
     public List<Plantacao> lerArquivoPlantacoes(JdbcTemplate conexao) throws IOException {
-        String directory = "downloaded-bases/";
+        String directory = "C:/Users/a933759/Documents/Apps/DataTechJava/downloaded-bases";
         // Lista os arquivos na pasta de downloads
         Stream<Path> files = Files.list(Paths.get(directory));
 
@@ -67,8 +87,13 @@ public class Application {
                 Log logExtracaoBase = new Log("OK", aplicacao, LocalDateTime.now(), "Plantações extraídas com sucesso");
 //                conectarComBanco().inserirLogNoBanco(logExtracaoBase);
                 System.out.println("Plantações extraídas com sucesso");
-
+                registerSuccess();
                 return plantacoes;
+            } catch (Exception e) {
+                System.err.println("Houve um erro ao registar planatações: " + e.getMessage());
+                errorSlack(e);
+                registerFalied();
+                throw new RuntimeException(e);
             }
         }
 
@@ -89,11 +114,14 @@ public class Application {
             Log logExtracaoBase = new Log("OK", aplicacao, LocalDateTime.now(), "Climas registrados com sucesso");
 //            conectarComBanco().inserirLogNoBanco(logExtracaoBase);
             System.out.println("Climas registrados com sucesso");
+            registerSuccess();
         } catch (Exception e) {
             errorSlack(e);
             Log log = new Log("ERRO", aplicacao, LocalDateTime.now(), "Erro ao registrar climas");
 //            conectarComBanco().inserirLogNoBanco(log);
+            registerFalied();
             throw new RuntimeException(e);
+
         }
 
         return climas;
@@ -113,11 +141,13 @@ public class Application {
 
             LeitorEstadoMunicipio leitorEstadoMunicipio = new LeitorEstadoMunicipio();
             estadoMunicipios = leitorEstadoMunicipio.extrairEstadoMunicipio(caminhoEstadoMunicipio, arquivoEstadoMunicipio);
+            registerSuccess();
         } catch (Exception e) {
             System.err.println("Erro inesperado em ler EstadoMunicipios: " + e.getMessage());
             Log log = new Log("ERRO", aplicacao, LocalDateTime.now(), "Falha ao registrar municípios");
 //            conectarComBanco().inserirLogNoBanco(log);
             errorSlack(e);
+            registerFalied();
         }
         return estadoMunicipios;
     }
@@ -132,9 +162,11 @@ public class Application {
             Log logSucesso = new Log("OK", aplicacao + " ", LocalDateTime.now(), " Plantações inseridas com sucesso no banco de dados");
 //            conectarComBanco().inserirLogNoBanco(logSucesso);
             System.out.println("Inserções encerradas");
+            registerSuccess();
         } catch (Exception e) {
             Log logFalha = new Log("ERRO", aplicacao + " ", LocalDateTime.now(), "Falha ao inserir plantações no banco de dados");
 //            conectarComBanco().inserirLogNoBanco(logFalha);
+            registerFalied();
             throw e;
         }
     }
@@ -149,9 +181,11 @@ public class Application {
             Log logSucesso = new Log("OK", aplicacao + " ", LocalDateTime.now(), "Climas inseridos com sucesso no banco de dados");
             System.out.println("Climas inseridos com sucesso no banco de dados");
 //            conectarComBanco().inserirLogNoBanco(logSucesso);
+            registerSuccess();
         } catch (Exception e) {
             Log logFalha = new Log("ERRO", aplicacao + " ", LocalDateTime.now(), "Falha ao inserir climas no banco de dados");
 //            conectarComBanco().inserirLogNoBanco(logFalha);
+            registerFalied();
             throw e;
         }
     }
@@ -165,9 +199,11 @@ public class Application {
             Log logSucesso = new Log("OK", aplicacao + " ", LocalDateTime.now(), "EstadoMunicipios inseridos com sucesso no banco de dados");
             System.out.println("EstadoMunicipios inseridos com sucesso no banco de dados");
 //            conectarComBanco().inserirLogNoBanco(logSucesso);
+            registerSuccess();
         } catch (Exception e) {
             Log logFalha = new Log("ERRO", aplicacao + " ", LocalDateTime.now(), "Falha ao inserir EstadoMunicipios no banco de dados");
 //            conectarComBanco().inserirLogNoBanco(logFalha);
+            registerFalied();
             throw e;
         }
     }
