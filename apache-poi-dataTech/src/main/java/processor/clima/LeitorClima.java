@@ -1,9 +1,11 @@
 package processor.clima;
 
+import com.mysql.cj.jdbc.JdbcConnection;
 import datatech.log.Log;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.jdbc.core.JdbcOperations;
 import writer.ConexaoBanco;
 
 import java.io.IOException;
@@ -26,6 +28,18 @@ public class LeitorClima {
     public List<Clima> extrairClimas(Path nomeArquivo, InputStream arquivo) {
         try {
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
+
+            String nomeArquivoString = nomeArquivo.toString();
+
+            // Dividir o nome do arquivo para extrair o ID da fazenda
+            String[] splittedName = nomeArquivoString.split("\\\\"); // Usar "\\" para Windows
+
+            // Pega o último elemento, que deve ser o nome do arquivo
+            String nomeArquivoSomente = splittedName[splittedName.length - 1];
+
+            // Divide o nome do arquivo pelo ponto para pegar o ID da fazenda
+            String[] partes = nomeArquivoSomente.split("_");
+            Integer idFazenda = Integer.parseInt(partes[1]);
 
             // Criando um objeto Workbook a partir do arquivo recebido
             Workbook workbook;
@@ -78,7 +92,7 @@ public class LeitorClima {
                 clima.setMediaTemperaturaMaxima(lerValor(row.getCell(1)));
                 clima.setMediaTemperaturaMinima(lerValor(row.getCell(2)));
                 clima.setUmidadeAr(lerValor(row.getCell(3)));
-
+                clima.setIdFazenda(idFazenda);
                 climasExtraidos.add(clima);
             }
 
@@ -100,20 +114,25 @@ public class LeitorClima {
         if (cell == null) {
             return 0.0;
         }
+
         switch (cell.getCellType()) {
             case NUMERIC:
                 return cell.getNumericCellValue();
             case STRING:
+                String stringValue = cell.getStringCellValue().trim(); // Remove espaços em branco
+                if (stringValue.equalsIgnoreCase("null") || stringValue.isEmpty()) {
+                    return 0.0; // Retorna 0.0 se a string for "null" ou vazia
+                }
                 try {
-                    return Double.parseDouble(cell.getStringCellValue().replace(",", "."));
+                    return Double.parseDouble(stringValue.replace(",", "."));
                 } catch (NumberFormatException e) {
                     errorSlack(e);
                     System.err.println("Erro ao converter para Double: " + e.getMessage());
                     throw new Error("Erro ao converter para Double (Leitor Clima): " + e.getMessage(), e);
-                    // retutn 0.0;
                 }
             default:
                 return 0.0;
         }
+
     }
 }
