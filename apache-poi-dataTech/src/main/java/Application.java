@@ -10,6 +10,7 @@ import processor.estadoMunicipio.EstadoMunicipio;
 import processor.estadoMunicipio.LeitorEstadoMunicipio;
 import service.SlackService;
 import writer.ConexaoBanco;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -28,8 +29,7 @@ public class Application {
     String aplicacao = "Main";
 
 
-
-    public ConexaoBanco conectarComBanco(){
+    public ConexaoBanco conectarComBanco() {
         return new ConexaoBanco();
     }
 
@@ -52,20 +52,20 @@ public class Application {
         // "plantacao"
         Stream<Path> arquivosPlantacao = files.filter(
                 file -> !Files.isDirectory(file)
-                       && file.getFileName().toString().toLowerCase().endsWith(".xlsx")
-                       && file.getFileName().toString().toLowerCase().startsWith("plantacao")
+                        && file.getFileName().toString().toLowerCase().endsWith(".xlsx")
+                        && file.getFileName().toString().toLowerCase().startsWith("plantacao")
         );
 
         // Converte a stream para lista (não dá pra fazer foreach em Stream)
         List<Path> plantacaoList = arquivosPlantacao.toList();
 
-        for (Path arquivoPlantacao: plantacaoList) {
+        for (Path arquivoPlantacao : plantacaoList) {
             try (InputStream arquivoPlantacoes = Files.newInputStream(arquivoPlantacao)) {
                 Leitor leitor = new Leitor();
                 List<Plantacao> plantacoes = leitor.extrairPlantacao(arquivoPlantacao.getFileName().toString(), arquivoPlantacoes, conexao);
 
-                Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "Plantações extraídas com sucesso");
-                // conectarComBanco().inserirLogNoBanco(logExtracaoBase);
+                Log logExtracaoBase = new Log("OK", aplicacao, LocalDateTime.now(), "Plantações extraídas com sucesso");
+//                conectarComBanco().inserirLogNoBanco(logExtracaoBase);
                 System.out.println("Plantações extraídas com sucesso");
 
                 return plantacoes;
@@ -86,15 +86,13 @@ public class Application {
             LeitorClima leitorClima = new LeitorClima();
             climas = leitorClima.extrairClimas(caminhoClima, arquivoClima);
 
-            Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "Climas registrados com sucesso");
-            conectarComBanco().inserirLogNoBanco(logExtracaoBase);
+            Log logExtracaoBase = new Log("OK", aplicacao, LocalDateTime.now(), "Climas registrados com sucesso");
+//            conectarComBanco().inserirLogNoBanco(logExtracaoBase);
             System.out.println("Climas registrados com sucesso");
-
-        Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "Climas registrados com sucesso");
-        // conectarComBanco().inserirLogNoBanco(logExtracaoBase);
-        System.out.println("Climas registrados com sucesso");
         } catch (Exception e) {
             errorSlack(e);
+            Log log = new Log("ERRO", aplicacao, LocalDateTime.now(), "Erro ao registrar climas");
+//            conectarComBanco().inserirLogNoBanco(log);
             throw new RuntimeException(e);
         }
 
@@ -109,70 +107,67 @@ public class Application {
             Path caminhoEstadoMunicipio = Path.of(nomeArquivoEstadoMunicipio);
             InputStream arquivoEstadoMunicipio = Files.newInputStream(caminhoEstadoMunicipio);
 
-        Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "EstadoMunicipios registrados com sucesso");
-        // conectarComBanco().inserirLogNoBanco(logExtracaoBase);
-        System.out.println("EstadoMunicipios registrados com sucesso");
+            Log logExtracaoBase = new Log("OK", aplicacao, LocalDateTime.now(), "EstadoMunicipios registrados com sucesso");
+//            conectarComBanco().inserirLogNoBanco(logExtracaoBase);
+            System.out.println("EstadoMunicipios registrados com sucesso");
 
             LeitorEstadoMunicipio leitorEstadoMunicipio = new LeitorEstadoMunicipio();
             estadoMunicipios = leitorEstadoMunicipio.extrairEstadoMunicipio(caminhoEstadoMunicipio, arquivoEstadoMunicipio);
-
-            Log logExtracaoBase = new Log(aplicacao, LocalDateTime.now(), "EstadoMunicipios registrados com sucesso");
-            conectarComBanco().inserirLogNoBanco(logExtracaoBase);
-            System.out.println("EstadoMunicipios registrados com sucesso");
         } catch (Exception e) {
             System.err.println("Erro inesperado em ler EstadoMunicipios: " + e.getMessage());
+            Log log = new Log("ERRO", aplicacao, LocalDateTime.now(), "Falha ao registrar municípios");
+//            conectarComBanco().inserirLogNoBanco(log);
             errorSlack(e);
         }
         return estadoMunicipios;
     }
 
     public void inserirPlantacoesNoBanco(List<Plantacao> plantacoes) {
-        Log logInsercaoBanco = new Log(aplicacao, LocalDateTime.now(), "Inserindo dados de plantações lidos no Banco de dados...");
-        // conectarComBanco().inserirLogNoBanco(logInsercaoBanco);
+        Log logInsercaoBanco = new Log("OK", aplicacao, LocalDateTime.now(), "Inserindo dados de plantações lidos no Banco de dados...");
+//        conectarComBanco().inserirLogNoBanco(logInsercaoBanco);
         System.out.println("Inserindo dados de plantações lidos no Banco de dados...");
 
         try {
             conectarComBanco().inserirPlantacoesNoBanco(plantacoes);
-            Log logSucesso = new Log(aplicacao + " ", LocalDateTime.now(), " Plantações inseridas com sucesso no banco de dados");
-            // conectarComBanco().inserirLogNoBanco(logSucesso);
+            Log logSucesso = new Log("OK", aplicacao + " ", LocalDateTime.now(), " Plantações inseridas com sucesso no banco de dados");
+//            conectarComBanco().inserirLogNoBanco(logSucesso);
             System.out.println("Inserções encerradas");
         } catch (Exception e) {
-            Log logFalha = new Log(aplicacao + " ", LocalDateTime.now(), "Falha ao inserir plantações no banco de dados");
-            // conectarComBanco().inserirLogNoBanco(logFalha);
+            Log logFalha = new Log("ERRO", aplicacao + " ", LocalDateTime.now(), "Falha ao inserir plantações no banco de dados");
+//            conectarComBanco().inserirLogNoBanco(logFalha);
             throw e;
         }
     }
 
     public void inserirClimasNobanco(List<Clima> climas) {
-        Log log = new Log(aplicacao, LocalDateTime.now(), "Inserindo dados de clima lidos no Banco de dados...");
-        // conectarComBanco().inserirLogNoBanco(log);
+        Log log = new Log("OK", aplicacao, LocalDateTime.now(), "Inserindo dados de clima lidos no Banco de dados...");
+//        conectarComBanco().inserirLogNoBanco(log);
         System.out.println("Inserindo dados de clima lidos no Banco de dados...");
 
         try {
             conectarComBanco().inserirClimasNoBanco(climas);
-            Log logSucesso = new Log(aplicacao + " ", LocalDateTime.now(), "Climas inseridos com sucesso no banco de dados");
+            Log logSucesso = new Log("OK", aplicacao + " ", LocalDateTime.now(), "Climas inseridos com sucesso no banco de dados");
             System.out.println("Climas inseridos com sucesso no banco de dados");
-            // conectarComBanco().inserirLogNoBanco(logSucesso);
+//            conectarComBanco().inserirLogNoBanco(logSucesso);
         } catch (Exception e) {
-            Log logFalha = new Log(aplicacao + " ", LocalDateTime.now(), "Falha ao inserir climas no banco de dados");
-            // conectarComBanco().inserirLogNoBanco(logFalha);
+            Log logFalha = new Log("ERRO", aplicacao + " ", LocalDateTime.now(), "Falha ao inserir climas no banco de dados");
+//            conectarComBanco().inserirLogNoBanco(logFalha);
             throw e;
         }
     }
 
     public void inserirEstadoMunicipioNoBanco(List<EstadoMunicipio> estadoMunicipios) {
-        Log log = new Log(aplicacao, LocalDateTime.now(), "Inserindo dados de EstadoMunicipios lidos no Banco de dados...");
-        // conectarComBanco().inserirLogNoBanco(log);
+        Log log = new Log("OK", aplicacao, LocalDateTime.now(), "Inserindo dados de EstadoMunicipios lidos no Banco de dados...");
+//        conectarComBanco().inserirLogNoBanco(log);
         System.out.println("Inserindo dados de EstadoMunicipios lidos no Banco de dados...");
 
         try {
-            conectarComBanco().inserirEstadoMunicipioNoBanco(estadoMunicipios);
-            Log logSucesso = new Log(aplicacao + " ", LocalDateTime.now(), "EstadoMunicipios inseridos com sucesso no banco de dados");
+            Log logSucesso = new Log("OK", aplicacao + " ", LocalDateTime.now(), "EstadoMunicipios inseridos com sucesso no banco de dados");
             System.out.println("EstadoMunicipios inseridos com sucesso no banco de dados");
-            // conectarComBanco().inserirLogNoBanco(logSucesso);
+//            conectarComBanco().inserirLogNoBanco(logSucesso);
         } catch (Exception e) {
-            Log logFalha = new Log(aplicacao + " ", LocalDateTime.now(), "Falha ao inserir EstadoMunicipios no banco de dados");
-            // conectarComBanco().inserirLogNoBanco(logFalha);
+            Log logFalha = new Log("ERRO", aplicacao + " ", LocalDateTime.now(), "Falha ao inserir EstadoMunicipios no banco de dados");
+//            conectarComBanco().inserirLogNoBanco(logFalha);
             throw e;
         }
     }

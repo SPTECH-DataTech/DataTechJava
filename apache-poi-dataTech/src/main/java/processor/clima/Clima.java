@@ -33,7 +33,6 @@ public class Clima {
             return formatoSaida.format(formatoEntrada.parse(dataMedicao));
         } catch (Exception e) {
             System.err.println("Erro ao converter a data: " + dataMedicao);
-
             return null;
         }
 

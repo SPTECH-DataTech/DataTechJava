@@ -22,7 +22,6 @@ public class ConexaoBanco {
 
     public ConexaoBanco() {
         BasicDataSource basicDataSource = new BasicDataSource();
-
         basicDataSource.setUrl("jdbc:mysql://34.198.235.194:3306/datatech");
         basicDataSource.setUsername("root");
         basicDataSource.setPassword("datatech123");
@@ -31,25 +30,23 @@ public class ConexaoBanco {
     }
 
     public JdbcTemplate getConnection() {
-        if(singletonJdbcTemplate == null) {
+        if (singletonJdbcTemplate == null) {
             this.singletonJdbcTemplate = new JdbcTemplate(dataSource);
         }
-
         return this.singletonJdbcTemplate;
     }
 
+    public JdbcTemplate gerarNovaConexao() {
+        ConexaoBanco conexaoBanco = new ConexaoBanco();
+        JdbcTemplate connection = conexaoBanco.getConnection();
 
-    //    public JdbcTemplate gerarNovaConeexao() {
-//        ConexaoBanco conexaoBanco = new ConexaoBanco();
-//        JdbcTemplate connection = conexaoBanco.getConnection();
-//
-//        return connection;
-//    }
+        return connection;
+    }
 
-  /*  public void inserirLogNoBanco(Log log){
+    public void inserirLogNoBanco(Log log) {
         System.out.println(log.getData().toString() + log.getAplicacao() + log.getDescricao());
-        gerarNovaConeexao().update("INSERT INTO logJava (descricao) VALUES (?)",log.getData().toString() + " " + log.getAplicacao() + " " + log.getDescricao());
-    }*/
+    gerarNovaConexao().update("INSERT INTO logJava (statusLog, descricao, dataLog, fkFazenda, fkEmpresa, fkEstadoMunicipio) VALUES (?, ?, ?, ?, ?, ?)", log.getClassificacao(), log.getAplicacao() + " " + log.getDescricao(), log.getData().toString(), log.getFkFazenda(), log.getFkEmpresa(), log.getFkEstadoMunicipio());
+    }
 
     /*public void inserirPlantacoesNoBanco(List<Plantacao> plantacoes) {
         JdbcTemplate conexao = getConnection();
@@ -87,7 +84,7 @@ public class ConexaoBanco {
         for (EstadoMunicipio estadoMunicipio : estadoMunicipios) {
             System.out.println(estadoMunicipio.toString());
             queries.add(String.format("INSERT IGNORE INTO estadoMunicipio(id, idUf, estado, municipio) VALUES (%d,%d,\"%s\",\"%s\")",
-                    estadoMunicipio.getIdMunicipio(), estadoMunicipio.getIdUf(), estadoMunicipio.getEstado(),  estadoMunicipio.getMunicipio()));
+                    estadoMunicipio.getIdMunicipio(), estadoMunicipio.getIdUf(), estadoMunicipio.getEstado(), estadoMunicipio.getMunicipio()));
         }
 
         conexao.batchUpdate(queries.toArray(new String[0]));
