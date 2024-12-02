@@ -2,10 +2,12 @@ package processor.clima;
 
 import com.mysql.cj.jdbc.JdbcConnection;
 import datatech.log.Log;
+import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.jdbc.core.JdbcOperations;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 import writer.ConexaoBanco;
 
 import java.io.IOException;
@@ -21,6 +23,8 @@ import static service.SlackService.sendMessage;
 public class LeitorClima {
     private String aplicacao = "LeitorClima";
     ConexaoBanco conexaoBanco = new ConexaoBanco();
+    String municipio = "";
+    String campoMunicipio = "";
 
     public LeitorClima() {
     }
@@ -30,16 +34,6 @@ public class LeitorClima {
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
 
             String nomeArquivoString = nomeArquivo.toString();
-
-            // Dividir o nome do arquivo para extrair o ID da fazenda
-            String[] splittedName = nomeArquivoString.split("\\\\"); // Usar "\\" para Windows
-
-            // Pega o último elemento, que deve ser o nome do arquivo
-            String nomeArquivoSomente = splittedName[splittedName.length - 1];
-
-            // Divide o nome do arquivo pelo ponto para pegar o ID da fazenda
-            String[] partes = nomeArquivoSomente.split("_");
-            Integer idFazenda = Integer.parseInt(partes[1]);
 
             // Criando um objeto Workbook a partir do arquivo recebido
             Workbook workbook;
@@ -56,6 +50,13 @@ public class LeitorClima {
             for (Row row : sheet) {
                 Clima clima = new Clima();
 
+                if (row.getRowNum() == 0){
+                    Cell cell = row.getCell(0);
+                    campoMunicipio = cell.getStringCellValue();
+                    String[] partes = campoMunicipio.split(": ");
+                    municipio = partes[1];
+
+                }
                 if (row.getRowNum() < 11) {
 
                     System.out.println("\nLendo cabeçalho");
@@ -66,6 +67,8 @@ public class LeitorClima {
                         if (row.getRowNum() == 0) {
                             clima.setMunicipio(row.getCell(0).getStringCellValue());
                         }
+
+
 
                         if (cell != null && cell.getCellType() == CellType.STRING) {
                             String coluna = cell.getStringCellValue();
@@ -88,11 +91,19 @@ public class LeitorClima {
                 } else {
                     clima.setDataMedicao("Data não disponível");
                 }
+                Double mediaTemperaturaMaxima = lerValor(row.getCell(1));
+                Double mediaTemperaturaMinima = lerValor(row.getCell(2));
+                Double umidadeAr = lerValor(row.getCell(3));
+
+
+                if (mediaTemperaturaMaxima == 0.0 || mediaTemperaturaMinima == 0.0 || umidadeAr == 0.0) {
+                    continue;
+                }
 
                 clima.setMediaTemperaturaMaxima(lerValor(row.getCell(1)));
                 clima.setMediaTemperaturaMinima(lerValor(row.getCell(2)));
                 clima.setUmidadeAr(lerValor(row.getCell(3)));
-                clima.setIdFazenda(idFazenda);
+                clima.setMunicipio(municipio);
                 climasExtraidos.add(clima);
             }
 
@@ -100,6 +111,7 @@ public class LeitorClima {
             workbook.close();
 
             System.out.println("\nLeitura do arquivo finalizada\n");
+            System.out.println("Municipio: " + municipio);
 //            Log log = new Log("OK", this.aplicacao, LocalDateTime.now(), "Leitura do arquivo finalizada");
 //            conexaoBanco.inserirLogNoBanco(log);
             return climasExtraidos;
