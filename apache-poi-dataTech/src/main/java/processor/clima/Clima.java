@@ -16,6 +16,8 @@ public class Clima {
     private Integer idFazenda;
 
 
+
+
     public Clima() {
 
     }
@@ -92,9 +94,12 @@ public class Clima {
     @Override
     public String toString() {
         return "Clima{" +
-                "mediaTemperaturaMinima=" + mediaTemperaturaMinima +
+                "dataMedicao='" + dataMedicao + '\'' +
+                ", mediaTemperaturaMinima=" + mediaTemperaturaMinima +
                 ", mediaTemperaturaMaxima=" + mediaTemperaturaMaxima +
                 ", umidadeAr=" + umidadeAr +
+                ", municipio='" + municipio + '\'' +
+                ", idFazenda=" + idFazenda +
                 '}';
     }
 }

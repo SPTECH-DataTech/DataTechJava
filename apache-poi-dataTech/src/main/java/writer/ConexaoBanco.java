@@ -71,16 +71,35 @@ public class ConexaoBanco {
         conexao.batchUpdate(queries.toArray(new String[0]));
     }
 
-
-
-    public void inserirClimasNoBanco(List<Clima> climas) {
-        for (Clima clima : climas) {
-            System.out.println(clima.toString());
-            getConnection().update("INSERT INTO climaMunicipioDash2 (fkMunicipio,dataCaptura, temperaturaMax, temperaturaMin, umidadeMedia) VALUES (?,?,?,?)",
-                    clima.getDataMedicao(), clima.getMediaTemperaturaMaxima(), clima.getMediaTemperaturaMinima(), clima.getUmidadeAr());
+    public Integer buscarFkMunicipio(String municipio) {
+        String sql = "SELECT id FROM estadoMunicipio WHERE municipio = ?";
+        try {
+            return getConnection().queryForObject(sql, new Object[]{municipio}, Integer.class);
+        } catch (Exception e) {
+            System.err.println("Erro ao buscar fkMunicipio: " + e.getMessage());
+            return null;
         }
     }
 
+    public void inserirClimasNoBanco(List<Clima> climas) {
+        for (Clima clima : climas) {
+        Integer fkMunicipio = buscarFkMunicipio(clima.getMunicipio());
+
+        if (fkMunicipio == null) {
+            System.out.println("fkMunicipio não encontrado: " + clima.getMunicipio() + ". Ignorando inserção...");
+            continue;
+        }
+
+
+            System.out.println(clima.toString());
+            getConnection().update("INSERT INTO climaMunicipioDash2 (fkMunicipio, dataCaptura, temperaturaMax, temperaturaMin, umidadeMedia) VALUES (?, ?, ?, ?, ?)",
+                    fkMunicipio,
+                    clima.getDataMedicao(),
+                    clima.getMediaTemperaturaMaxima(),
+                    clima.getMediaTemperaturaMinima(),
+                    clima.getUmidadeAr());
+        }
+    }
     public void inserirEstadoMunicipioNoBanco(List<EstadoMunicipio> estadoMunicipios) {
         JdbcTemplate conexao = getConnection();
         List<String> queries = new ArrayList<>();
