@@ -1,11 +1,15 @@
 package processor.clima;
 
+import datatech.log.Log;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import writer.ConexaoBanco;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +17,8 @@ import static service.SlackService.errorSlack;
 import static service.SlackService.sendMessage;
 
 public class LeitorClima {
+    private String aplicacao = "LeitorClima";
+    ConexaoBanco conexaoBanco = new ConexaoBanco();
 
     public LeitorClima() {
     }
@@ -62,7 +68,6 @@ public class LeitorClima {
                 }
 
 
-
                 Cell cellDataMedicao = row.getCell(0);
                 if (cellDataMedicao != null) {
                     clima.setDataMedicao(cellDataMedicao.toString());
@@ -81,9 +86,12 @@ public class LeitorClima {
             workbook.close();
 
             System.out.println("\nLeitura do arquivo finalizada\n");
+//            Log log = new Log("OK", this.aplicacao, LocalDateTime.now(), "Leitura do arquivo finalizada");
+//            conexaoBanco.inserirLogNoBanco(log);
             return climasExtraidos;
         } catch (IOException e) {
-
+            System.out.println("Falha ao ler arquivo de clima");
+//            Log log = new Log("Erro", this.aplicacao, LocalDateTime.now(), "Falha ao ler arquivo de clima");
             throw new RuntimeException(e);
         }
     }

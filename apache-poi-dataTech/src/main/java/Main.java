@@ -1,5 +1,6 @@
 
 import client.S3Service;
+import org.springframework.jdbc.core.JdbcTemplate;
 import processor.Plantacao;
 import processor.clima.Clima;
 import processor.estadoMunicipio.EstadoMunicipio;
@@ -15,39 +16,22 @@ import static service.SlackService.sendMessage;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-
         Application aplicacao = new Application();
-
         ConexaoBanco conexaoBanco = aplicacao.conectarComBanco();
-
-       S3Service conexaoBucket = aplicacao.conectarComBucket();
-
-       aplicacao.baixarArquivosS3(conexaoBucket);
-
+        JdbcTemplate conexao = conexaoBanco.getConnection();
+        S3Service conexaoBucket = aplicacao.conectarComBucket();
+        aplicacao.baixarArquivosS3(conexaoBucket);
         //===================================================================================================================
-
         //Leitura
-
+        List<Plantacao> plantacoes = aplicacao.lerArquivoPlantacoes(conexao);
         List<EstadoMunicipio> estadosMunicipios = aplicacao.lerArquivoEstadoMunicipio();
         sendMessage();
-
-        List<Clima> climas = aplicacao.lerArquivoClima();
-
-        List<Plantacao> plantacoes = aplicacao.lerArquivoPlantacoes();
-
+//        List<Clima> climas = aplicacao.lerArquivoClima();
         //====================================================================================
-
         //BD
-        aplicacao.inserirEstadoMunicipioNoBanco(estadosMunicipios);
-
-        aplicacao.inserirClimasNobanco(climas);
-
         aplicacao.inserirPlantacoesNoBanco(plantacoes);
-
+        aplicacao.inserirEstadoMunicipioNoBanco(estadosMunicipios);
+//        aplicacao.inserirClimasNobanco(climas);
         //===================================================================================================================
-
-
-
-
     }
 }

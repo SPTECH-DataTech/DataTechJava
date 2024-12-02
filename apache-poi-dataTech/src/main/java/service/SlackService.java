@@ -20,7 +20,6 @@ public class SlackService {
     private static final String TOKEN = System.getenv("TOKEN_SLACK");
     private static final String CHANNEL_ID = System.getenv("CHANNEL_ID");
 
-
     public static void sendMessage() {
         try {
             Slack slack = Slack.getInstance();
