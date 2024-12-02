@@ -64,7 +64,7 @@ public class Application {
     }
 
     public List<Plantacao> lerArquivoPlantacoes(JdbcTemplate conexao) throws IOException {
-        String directory = "C:/Users/a933759/Documents/Apps/DataTechJava/downloaded-bases";
+        String directory = "downloaded-bases/";
         // Lista os arquivos na pasta de downloads
         Stream<Path> files = Files.list(Paths.get(directory));
 
