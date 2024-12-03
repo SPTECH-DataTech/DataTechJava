@@ -101,7 +101,7 @@ public class Application {
     }
 
     public List<Clima> lerArquivoClima() throws IOException {
-        String nomeArquivoClima = "../downloaded-bases/dados_83083_M_1985-01-01_1985-12-31.xlsx";
+        String nomeArquivoClima = "downloaded-bases/dados_83083_M_1985-01-01_1985-12-31.xlsx";
         List<Clima> climas = new ArrayList<>();
 
         try {
