@@ -2,28 +2,18 @@ package processor.plantacao;
 
 public class Plantacao {
     private Integer ano;
-    // private Integer municipio;
     private Double quantidadeColhida;
     private Double areaPlantada;
     private Double valorReais;
     private Integer fkFazenda;
     private Integer fazenda_fkEmpresa;
     private Integer fazenda_fkEstadoMunicipio;
-    // private Integer tipoCafe;
 
     public Plantacao(){}
-
-    /*public Integer getMunicipio() {
-        return municipio;
-    }*/
 
     public Integer getAno() {
         return ano;
     }
-
-    /*public Integer getTipoCafe() {
-        return tipoCafe;
-    }*/
 
     public Double getAreaPlantada() {
         return areaPlantada;
@@ -37,17 +27,9 @@ public class Plantacao {
         return valorReais;
     }
 
-    /*public void setMunicipio(Integer municipio) {
-        this.municipio = municipio;
-    }*/
-
     public void setAno(Integer ano) {
         this.ano = ano;
     }
-
-    /*public void setTipoCafe(Integer tipoCafe) {
-        this.tipoCafe = tipoCafe;
-    }*/
 
     public void setAreaPlantada(Double areaPlantada) {
         this.areaPlantada = areaPlantada;

@@ -35,23 +35,16 @@ public class LeitorPlantacao extends LeitorArquivos {
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
             JdbcTemplate conexao = conexaoBanco.getConnection();
 
-            // divide o nome do arquivo em 2 pelo traço (exemplo: plantacao-5.xlsx
-            // vira [plantacao, 5.xlsx]
             String[] splittedName = nomeArquivo.toString().split("-");
 
-            // faz a mesma coisa e divide o 5.xlsx pelo ponto e vira [5, xlsx]
             Integer idFazenda = Integer.parseInt(splittedName[1].split("\\.")[0]);
 
-            // query da fkEmpresa
             Integer fkEmpresa = conexao.queryForObject("SELECT fkEmpresa FROM fazenda where id = " + idFazenda, Integer.class);
 
-            // query do fkEstadoMunicipio
             Integer fkEstadoMunicipio = conexao.queryForObject("SELECT fkEstadoMunicipio FROM fazenda where id = " + idFazenda, Integer.class);
 
-            // query do fkTipoCafe
             Integer fkTipoCafe = conexao.queryForObject("SELECT fkTipoCafe FROM fazenda where id = " + idFazenda, Integer.class);
 
-            // Criando um objeto Workbook a partir do arquivo recebido
             Workbook workbook;
             if (nomeArquivo.endsWith(".xlsx")) {
                 workbook = new XSSFWorkbook(arquivo);
@@ -63,12 +56,7 @@ public class LeitorPlantacao extends LeitorArquivos {
 
             List<Plantacao> plantacoes = new ArrayList<>();
 
-            // Iterando sobre as linhas da planilha
             for (Row row : sheet) {
-
-                //for (int b = 5000; b < 6000; b++) {
-
-                //Row row = sheet.getRow(b);
 
                 if (row.getRowNum() == 0) {
                     System.out.println("\nLendo cabeçalho");
@@ -98,8 +86,6 @@ public class LeitorPlantacao extends LeitorArquivos {
                         qtdColhida != 0 &&
                         areaPlantada != 0) {
 
-                    // Extraindo valor das células e criando objeto plantação
-
                     Plantacao plantacao = new Plantacao();
                     plantacao.setAno(ano);
                     plantacao.setQuantidadeColhida(qtdColhida);
@@ -115,8 +101,6 @@ public class LeitorPlantacao extends LeitorArquivos {
 
                 }
             }
-
-            // Fechando o workbook após a leitura
             workbook.close();
 
             Log log = new Log("OK", this.aplicacao + " ", LocalDateTime.now(), " Leitura do arquivo finalizada", idFazenda, fkEmpresa, fkEstadoMunicipio);
@@ -126,7 +110,6 @@ public class LeitorPlantacao extends LeitorArquivos {
             return plantacoes;
 
         } catch (IOException e) {
-            // Caso ocorra algum erro durante a leitura do arquivo uma exceção será lançada
             Log log = new Log("ERRO", this.aplicacao + " ", LocalDateTime.now(), "Erro ao ler o arquivo");
             System.out.println("Erro ao ler o arquivo" + e.getMessage());
             logs.add(log);

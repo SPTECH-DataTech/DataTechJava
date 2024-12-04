@@ -47,21 +47,11 @@ public class ConexaoBanco {
         gerarNovaConexao().update("INSERT IGNORE INTO logJava (statusLog, descricao, dataLog, fkFazenda, fkEmpresa, fkEstadoMunicipio) VALUES (?, ?, ?, ?, ?, ?)", log.getClassificacao(), log.getAplicacao() + " " + log.getDescricao(), log.getData().toString(), log.getFkFazenda(), log.getFkEmpresa(), log.getFkEstadoMunicipio());
     }
 
-    /*public void inserirPlantacoesNoBanco(List<Plantacao> plantacoes) {
-        JdbcTemplate conexao = getConnection();
-
-        for (Plantacao plantacao : plantacoes) {
-            conexao.update("INSERT INTO plantacaoMunicipioDash (fkMunicipio, ano, fkTipoCafe, areaPlantada, quantidadeColhida, valorTotalReais) VALUES (?,?,?,?,?,?)",
-                    plantacao.getMunicipio(), plantacao.getAno(), plantacao.getTipoCafe(), plantacao.getAreaPlantada(), plantacao.getQuantidadeColhida(), plantacao.getValorReais());
-        }
-    }*/
-
     public void inserirPlantacoesNoBanco(List<Plantacao> plantacoes) {
         JdbcTemplate conexao = getConnection();
 
         List<String> queries = new ArrayList<>();
         for (Plantacao plantacao : plantacoes) {
-            // System.out.println(estadoMunicipio.toString());
             queries.add(String.format("INSERT IGNORE INTO plantacaoFazenda (fkFazenda, fazenda_fkEmpresa, fazenda_fkEstadoMunicipio, ano, areaPlantada, quantidadeColhida, valorTotalReais) VALUES (%d, %d, %d, %d, %s, %s, %s);",
                     plantacao.getFkFazenda(), plantacao.getFazenda_fkEmpresa(), plantacao.getFazenda_fkEstadoMunicipio(), plantacao.getAno(), plantacao.getAreaPlantada().toString().replace(",", "."), plantacao.getQuantidadeColhida().toString().replace(",", "."), plantacao.getValorReais().toString().replace(",", ".")));
         }
@@ -91,7 +81,7 @@ public class ConexaoBanco {
 
             System.out.println(clima.toString());
 
-            getConnection().update("INSERT INTO climaMunicipioDash2 (fkMunicipio, dataCaptura, temperaturaMax, temperaturaMin, umidadeMedia) VALUES (?, ?, ?, ?, ?)",
+            getConnection().update("INSERT INTO climaMunicipioDash (fkMunicipio, dataCaptura, temperaturaMax, temperaturaMin, umidadeMedia) VALUES (?, ?, ?, ?, ?)",
                     fkMunicipio,
                     clima.getDataMedicao(),
                     clima.getMediaTemperaturaMaxima(),

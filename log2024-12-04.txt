@@ -1,0 +1,5 @@
+(OK) Plantações extraídas com sucesso 2024-12-04T16:18:13.527213100
+(OK) EstadoMunicipios registrados com sucesso 2024-12-04T16:18:13.527213100
+(OK) Climas registrados com sucesso 2024-12-04T16:18:13.957891400
+(OK)  Plantações inseridas com sucesso no banco de dados 2024-12-04T16:18:16.692737400
+(OK) EstadoMunicipios inseridos com sucesso no banco de dados 2024-12-04T16:18:16.692737400

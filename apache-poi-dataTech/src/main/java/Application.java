@@ -65,18 +65,13 @@ public class Application {
 
     public List<Plantacao> lerArquivoPlantacoes(JdbcTemplate conexao) throws IOException {
         String directory = "downloaded-bases/";
-        // Lista os arquivos na pasta de downloads
         Stream<Path> files = Files.list(Paths.get(directory));
 
-        // Filtra os arquivos removendo pastas e só pegando arquivos .xlsx e que começam com
-        // "plantacao"
         Stream<Path> arquivosPlantacao = files.filter(
                 file -> !Files.isDirectory(file)
                         && file.getFileName().toString().toLowerCase().endsWith(".xlsx")
                         && file.getFileName().toString().toLowerCase().startsWith("plantacao")
         );
-
-        // Converte a stream para lista (não dá pra fazer foreach em Stream)
         List<Path> plantacaoList = arquivosPlantacao.toList();
 
         for (Path arquivoPlantacao : plantacaoList) {

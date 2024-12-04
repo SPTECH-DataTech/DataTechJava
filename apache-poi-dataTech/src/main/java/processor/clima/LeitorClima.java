@@ -42,8 +42,6 @@ public class LeitorClima extends LeitorArquivos {
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
 
             String nomeArquivoString = nomeArquivo.toString();
-
-            // Criando um objeto Workbook a partir do arquivo recebido
             Workbook workbook;
             if (nomeArquivo.endsWith(".xlsx")) {
                 workbook = new XSSFWorkbook(arquivo);
@@ -54,7 +52,6 @@ public class LeitorClima extends LeitorArquivos {
             Sheet sheet = workbook.getSheetAt(0);
             List<Clima> climasExtraidos = new ArrayList<>();
 
-            // Iterando sobre as linhas da planilha
             for (Row row : sheet) {
                 Clima clima = new Clima();
 
@@ -86,12 +83,9 @@ public class LeitorClima extends LeitorArquivos {
                         }
 
                     }
-
                     System.out.println("--------------------");
                     continue;
-
                 }
-
 
                 Cell cellDataMedicao = row.getCell(0);
                 if (cellDataMedicao != null) {
@@ -115,7 +109,6 @@ public class LeitorClima extends LeitorArquivos {
                 climasExtraidos.add(clima);
             }
 
-            // Fechando o workbook após a leitura
             workbook.close();
 
             System.out.println("\nLeitura do arquivo finalizada\n");
@@ -123,7 +116,6 @@ public class LeitorClima extends LeitorArquivos {
             logs.add(log);
 
             System.out.println("Municipio: " + municipio);
-//            Log log = new Log("OK", this.aplicacao, LocalDateTime.now(), "Leitura do arquivo finalizada");
 
 //            conexaoBanco.inserirLogNoBanco(log);
             return climasExtraidos;
@@ -146,7 +138,7 @@ public class LeitorClima extends LeitorArquivos {
             case STRING:
                 String stringValue = cell.getStringCellValue().trim(); // Remove espaços em branco
                 if (stringValue.equalsIgnoreCase("null") || stringValue.isEmpty()) {
-                    return 0.0; // Retorna 0.0 se a string for "null" ou vazia
+                    return 0.0;
                 }
                 try {
                     return Double.parseDouble(stringValue.replace(",", "."));

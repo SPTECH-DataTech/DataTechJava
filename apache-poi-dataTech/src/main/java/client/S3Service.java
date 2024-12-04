@@ -39,7 +39,6 @@ public class S3Service {
             s3Client.createBucket(createBucketRequest);
             Log log = new Log("OK", this.aplicacao + " ", LocalDateTime.now(), " Bucket criado com sucesso: " + bucketName);
             logs.add(log);
-//            System.out.println(log);
 //            conexao.inserirLogNoBanco(log);
 
         } catch (S3Exception e) {
@@ -55,7 +54,6 @@ public class S3Service {
             File file = new File(filePath);
             String fileName = file.getName();
 
-//            String uniqueFileName = UUID.randomUUID().toString() + ".txt";
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
                     .key(fileName)
@@ -93,38 +91,6 @@ public class S3Service {
 //            conexao.inserirLogNoBanco(log);
         }
     }
-
-//    public void downloadFiles() {
-//        try {
-//            // Lista todos os arquivos do bucket
-//            List<S3Object> objects = s3Client.listObjects(ListObjectsRequest.builder().bucket(bucketName).build()).contents();
-//
-//            // Para cada arquivo do bucket
-//            for (S3Object object : objects) {
-//                // Inicialização da classe que baixa o arquivo
-//                GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-//                        .bucket("bucket-data-tech")
-//                        .key(object.key())
-//                        .build();
-//
-//                // Diretório para o download
-//                String filePath = "downloaded-bases/" + object.key();
-//
-//                // Baixa o arquivo
-//                InputStream inputStream = s3Client.getObject(getObjectRequest, ResponseTransformer.toInputStream());
-//
-//                // Escreve o arquivo na pasta
-//                Files.write(Paths.get(filePath), inputStream.readAllBytes());
-//                Log log = new Log("OK",this.aplicacao + " ", LocalDateTime.now(), " Arquivo baixado: " + object.key());
-//                System.out.println("Arquivo baixado: " + object.key());
-//                // conexao.inserirLogNoBanco(log);
-//            }
-//        } catch (IOException | S3Exception e) {
-//            Log log = new Log("ERRO",this.aplicacao + " ", LocalDateTime.now(), " Erro ao fazer download dos arquivos: " + e.getMessage());
-//            System.err.println("Erro ao fazer download dos arquivos: " + e.getMessage());
-//            // conexao.inserirLogNoBanco(log);
-//        }
-//    }
 
     public void downloadFiles() throws IOException {
         try {
