@@ -64,7 +64,7 @@ public class Application {
     }
 
     public List<Plantacao> lerArquivoPlantacoes(JdbcTemplate conexao) throws IOException {
-        String directory = "downloaded-bases/";
+        String directory = "../downloaded-bases";
         // Lista os arquivos na pasta de downloads
         Stream<Path> files = Files.list(Paths.get(directory));
 
@@ -104,7 +104,7 @@ public class Application {
     }
 
     public List<Clima> lerArquivoClima() throws IOException {
-        String nomeArquivoClima = "downloaded-bases/dados_83083_M_1985-01-01_1985-12-31.xlsx";
+        String nomeArquivoClima = "../downloaded-bases/dados_83083_M_1985-01-01_1985-12-31.xlsx";
         List<Clima> climas = new ArrayList<>();
 
         try {
