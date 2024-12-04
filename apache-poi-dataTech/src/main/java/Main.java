@@ -1,5 +1,6 @@
 
 import client.S3Service;
+import datatech.log.Log;
 import org.springframework.jdbc.core.JdbcTemplate;
 import processor.Plantacao;
 import processor.clima.Clima;
@@ -8,6 +9,7 @@ import service.SlackService;
 import writer.ConexaoBanco;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static service.SlackService.sendMessage;
@@ -35,5 +37,6 @@ public class Main {
        aplicacao.inserirClimasNobanco(climas);
         sendMessage();
         //===================================================================================================================
+        aplicacao.inserirLogEmArquivo();
     }
 }

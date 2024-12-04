@@ -10,9 +10,11 @@ import org.springframework.jdbc.core.JdbcOperations;
 import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 import writer.ConexaoBanco;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,13 +25,16 @@ import static service.SlackService.sendMessage;
 public class LeitorClima {
     private String aplicacao = "LeitorClima";
     ConexaoBanco conexaoBanco = new ConexaoBanco();
+
+    List<Log> logs = new ArrayList<>();
     String municipio = "";
     String campoMunicipio = "";
+
 
     public LeitorClima() {
     }
 
-    public List<Clima> extrairClimas(Path nomeArquivo, InputStream arquivo) {
+    public List<Clima> extrairClimas(Path nomeArquivo, InputStream arquivo) throws IOException {
         try {
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
 
@@ -111,13 +116,18 @@ public class LeitorClima {
             workbook.close();
 
             System.out.println("\nLeitura do arquivo finalizada\n");
+            Log log = new Log("OK", this.aplicacao, LocalDateTime.now(), "Leitura do arquivo finalizada");
+            logs.add(log);
+
             System.out.println("Municipio: " + municipio);
 //            Log log = new Log("OK", this.aplicacao, LocalDateTime.now(), "Leitura do arquivo finalizada");
+
 //            conexaoBanco.inserirLogNoBanco(log);
             return climasExtraidos;
         } catch (IOException e) {
             System.out.println("Falha ao ler arquivo de clima");
-//            Log log = new Log("Erro", this.aplicacao, LocalDateTime.now(), "Falha ao ler arquivo de clima");
+            Log log = new Log("Erro", this.aplicacao, LocalDateTime.now(), "Falha ao ler arquivo de clima");
+            logs.add(log);
             throw new RuntimeException(e);
         }
     }
