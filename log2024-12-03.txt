@@ -1,4 +1,2 @@
-(OK) Plantações extraídas com sucesso 2024-12-03T20:37:17.883900800
-(OK) EstadoMunicipios registrados com sucesso 2024-12-03T20:37:17.884864400
-(OK)  Plantações inseridas com sucesso no banco de dados 2024-12-03T20:37:23.355568400
-(OK) EstadoMunicipios inseridos com sucesso no banco de dados 2024-12-03T20:37:23.356567900
+(OK) Plantações extraídas com sucesso 2024-12-03T22:55:19.539141500
+(OK)  Plantações inseridas com sucesso no banco de dados 2024-12-03T22:55:22.440802500

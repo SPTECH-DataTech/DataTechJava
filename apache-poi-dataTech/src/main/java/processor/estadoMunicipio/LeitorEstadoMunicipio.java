@@ -1,16 +1,13 @@
 package processor.estadoMunicipio;
 
 import datatech.log.Log;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import processor.Plantacao;
+import processor.LeitorArquivos;
 import writer.ConexaoBanco;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -21,16 +18,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class LeitorEstadoMunicipio {
+public class LeitorEstadoMunicipio extends LeitorArquivos {
 
-    String aplicacao = "LeitorEstadoMunicipio";
-    ConexaoBanco conexao = new ConexaoBanco();
-    List<Log> logs = new ArrayList<>();
+    private static final String aplicacao = "Leitor Estado Municipio" ;
+    private static final ConexaoBanco conexaoBanco = new ConexaoBanco();
+    private static final List logs = new ArrayList<>();
 
     public LeitorEstadoMunicipio() {
+        super(aplicacao, conexaoBanco, logs);
     }
 
-    public List<EstadoMunicipio> extrairEstadoMunicipio(Path nomeArquivo, InputStream arquivo) throws IOException {
+    @Override
+    public List extrairDados(String nomeArquivo, InputStream arquivo) {
         try {
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
 

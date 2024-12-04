@@ -1,4 +1,4 @@
-package processor;
+package processor.plantacao;
 
 public class Plantacao {
     private Integer ano;

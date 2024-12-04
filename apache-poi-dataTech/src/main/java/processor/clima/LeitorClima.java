@@ -7,6 +7,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.jdbc.core.JdbcOperations;
+import processor.LeitorArquivos;
 import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 import writer.ConexaoBanco;
 
@@ -22,19 +23,21 @@ import java.util.List;
 import static service.SlackService.errorSlack;
 import static service.SlackService.sendMessage;
 
-public class LeitorClima {
-    private String aplicacao = "LeitorClima";
-    ConexaoBanco conexaoBanco = new ConexaoBanco();
+public class LeitorClima extends LeitorArquivos {
+    private static final String aplicacao = "Leitor Estado Municipio" ;
+    private static final ConexaoBanco conexaoBanco = new ConexaoBanco();
+    private static final List logs = new ArrayList<>();
 
-    List<Log> logs = new ArrayList<>();
     String municipio = "";
     String campoMunicipio = "";
 
 
     public LeitorClima() {
+        super(aplicacao, conexaoBanco, logs);
     }
 
-    public List<Clima> extrairClimas(Path nomeArquivo, InputStream arquivo) throws IOException {
+    @Override
+    public List extrairDados(String nomeArquivo, InputStream arquivo) {
         try {
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
 

@@ -2,13 +2,12 @@ import client.S3Provider;
 import client.S3Service;
 import datatech.log.Log;
 import org.springframework.jdbc.core.JdbcTemplate;
-import processor.Leitor;
-import processor.Plantacao;
+import processor.plantacao.LeitorPlantacao;
+import processor.plantacao.Plantacao;
 import processor.clima.Clima;
 import processor.clima.LeitorClima;
 import processor.estadoMunicipio.EstadoMunicipio;
 import processor.estadoMunicipio.LeitorEstadoMunicipio;
-import service.SlackService;
 import writer.ConexaoBanco;
 
 import java.io.FileWriter;
@@ -82,8 +81,8 @@ public class Application {
 
         for (Path arquivoPlantacao : plantacaoList) {
             try (InputStream arquivoPlantacoes = Files.newInputStream(arquivoPlantacao)) {
-                Leitor leitor = new Leitor();
-                List<Plantacao> plantacoes = leitor.extrairPlantacao(arquivoPlantacao.getFileName().toString(), arquivoPlantacoes, conexao);
+                LeitorPlantacao leitorPlantacao = new LeitorPlantacao();
+                List<Plantacao> plantacoes = leitorPlantacao.extrairDados(arquivoPlantacao.getFileName().toString(), arquivoPlantacoes);
 
                 Log log = new Log("OK", aplicacao, LocalDateTime.now(), "Plantações extraídas com sucesso");
                 logs.add(log);
@@ -113,7 +112,7 @@ public class Application {
             InputStream arquivoClima = Files.newInputStream(caminhoClima);
 
             LeitorClima leitorClima = new LeitorClima();
-            climas = leitorClima.extrairClimas(caminhoClima, arquivoClima);
+            climas = leitorClima.extrairDados(caminhoClima.toString(), arquivoClima);
 
             Log log = new Log("OK", aplicacao, LocalDateTime.now(), "Climas registrados com sucesso");
             logs.add(log);
@@ -145,7 +144,7 @@ public class Application {
             logs.add(log);
             System.out.println("EstadoMunicipios registrados com sucesso");
             LeitorEstadoMunicipio leitorEstadoMunicipio = new LeitorEstadoMunicipio();
-            estadoMunicipios = leitorEstadoMunicipio.extrairEstadoMunicipio(caminhoEstadoMunicipio, arquivoEstadoMunicipio);
+            estadoMunicipios = leitorEstadoMunicipio.extrairDados(caminhoEstadoMunicipio.toString(), arquivoEstadoMunicipio);
             registerSuccess();
         } catch (Exception e) {
             System.err.println("Erro inesperado em ler EstadoMunicipios: " + e.getMessage());
