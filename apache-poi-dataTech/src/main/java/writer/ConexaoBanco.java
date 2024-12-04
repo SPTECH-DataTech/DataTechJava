@@ -91,7 +91,7 @@ public class ConexaoBanco {
 
             System.out.println(clima.toString());
 
-            getConnection().update("INSERT INTO climaMunicipioDash2 (fkMunicipio, dataCaptura, temperaturaMax, temperaturaMin, umidadeMedia) VALUES (?, ?, ?, ?, ?)",
+            getConnection().update("INSERT INTO climaMunicipioDash (fkMunicipio, dataCaptura, temperaturaMax, temperaturaMin, umidadeMedia) VALUES (?, ?, ?, ?, ?)",
                     fkMunicipio,
                     clima.getDataMedicao(),
                     clima.getMediaTemperaturaMaxima(),
