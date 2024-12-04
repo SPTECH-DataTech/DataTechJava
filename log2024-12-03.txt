@@ -1,0 +1,2 @@
+(OK) Plantações extraídas com sucesso 2024-12-03T22:55:19.539141500
+(OK)  Plantações inseridas com sucesso no banco de dados 2024-12-03T22:55:22.440802500

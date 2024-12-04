@@ -1,15 +1,13 @@
-package processor;
+package processor.plantacao;
 
 import datatech.log.Log;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.jdbc.core.JdbcTemplate;
-import service.SlackService;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value;
+import processor.LeitorArquivos;
 import writer.ConexaoBanco;
 
 import java.io.IOException;
@@ -21,25 +19,25 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static service.SlackService.errorSlack;
+public class LeitorPlantacao extends LeitorArquivos {
+    private static final String aplicacao = "Leitor Plantacao" ;
+    private static final ConexaoBanco conexaoBanco = new ConexaoBanco();
+    private static final List logs = new ArrayList<>();
 
-public class Leitor {
-    String aplicacao = "Leitor";
-    ConexaoBanco conexaoBanco = new ConexaoBanco();
-    List<Log> logs = new ArrayList<>();
 
-    public Leitor() {
+    public LeitorPlantacao() {
+        super(aplicacao, conexaoBanco, logs);
     }
 
-    public List<Plantacao> extrairPlantacao(String nomeArquivo, InputStream arquivo, JdbcTemplate conexao) {
+    @Override
+    public List extrairDados(String nomeArquivo, InputStream arquivo) {
         try {
-//            Log logInicioLeitura = new Log("OK", this.aplicacao + " ", LocalDateTime.now(), " Iniciando leitura do arquivo %s\n".formatted(nomeArquivo));
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
-//            conexaoBanco.inserirLogNoBanco(logInicioLeitura);
+            JdbcTemplate conexao = conexaoBanco.getConnection();
 
             // divide o nome do arquivo em 2 pelo traço (exemplo: plantacao-5.xlsx
             // vira [plantacao, 5.xlsx]
-            String[] splittedName = nomeArquivo.split("-");
+            String[] splittedName = nomeArquivo.toString().split("-");
 
             // faz a mesma coisa e divide o 5.xlsx pelo ponto e vira [5, xlsx]
             Integer idFazenda = Integer.parseInt(splittedName[1].split("\\.")[0]);
@@ -121,18 +119,17 @@ public class Leitor {
             // Fechando o workbook após a leitura
             workbook.close();
 
-            Log logFimLeitura = new Log("OK", this.aplicacao + " ", LocalDateTime.now(), " Leitura do arquivo finalizada", idFazenda, fkEmpresa, fkEstadoMunicipio);
-            logFimLeitura.inserirLogEmArquivo(logFimLeitura);
+            Log log = new Log("OK", this.aplicacao + " ", LocalDateTime.now(), " Leitura do arquivo finalizada", idFazenda, fkEmpresa, fkEstadoMunicipio);
             System.out.println("\nLeitura do arquivo finalizada\n");
-            conexaoBanco.inserirLogNoBanco(logFimLeitura);
-            logs.add(logFimLeitura);
+            logs.add(log);
+            conexaoBanco.inserirLogNoBanco(log);
             return plantacoes;
 
         } catch (IOException e) {
             // Caso ocorra algum erro durante a leitura do arquivo uma exceção será lançada
             Log log = new Log("ERRO", this.aplicacao + " ", LocalDateTime.now(), "Erro ao ler o arquivo");
             System.out.println("Erro ao ler o arquivo" + e.getMessage());
-            // conexao.inserirLogNoBanco(log);
+            logs.add(log);
             conexaoBanco.inserirLogNoBanco(log);
             throw new RuntimeException(e);
         }
