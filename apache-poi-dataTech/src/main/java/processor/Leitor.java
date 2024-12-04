@@ -25,16 +25,17 @@ import static service.SlackService.errorSlack;
 
 public class Leitor {
     String aplicacao = "Leitor";
-    ConexaoBanco conexao = new ConexaoBanco();
+    ConexaoBanco conexaoBanco = new ConexaoBanco();
+    List<Log> logs = new ArrayList<>();
 
-    public Leitor() {}
+    public Leitor() {
+    }
 
     public List<Plantacao> extrairPlantacao(String nomeArquivo, InputStream arquivo, JdbcTemplate conexao) {
         try {
-            Log logInicioLeitura = new Log(this.aplicacao + " ", LocalDateTime.now(), " Iniciando leitura do arquivo %s\n".formatted(nomeArquivo));
+//            Log logInicioLeitura = new Log("OK", this.aplicacao + " ", LocalDateTime.now(), " Iniciando leitura do arquivo %s\n".formatted(nomeArquivo));
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
-            // conexao.inserirLogNoBanco(logInicioLeitura);
-
+//            conexaoBanco.inserirLogNoBanco(logInicioLeitura);
 
             // divide o nome do arquivo em 2 pelo traço (exemplo: plantacao-5.xlsx
             // vira [plantacao, 5.xlsx]
@@ -69,7 +70,7 @@ public class Leitor {
 
                 //for (int b = 5000; b < 6000; b++) {
 
-                    //Row row = sheet.getRow(b);
+                //Row row = sheet.getRow(b);
 
                 if (row.getRowNum() == 0) {
                     System.out.println("\nLendo cabeçalho");
@@ -95,7 +96,9 @@ public class Leitor {
                     idTipoCafe = 1;
                 }
 
-                if (municipio.equals(fkEstadoMunicipio) && idTipoCafe.equals(fkTipoCafe)) {
+                if (municipio.equals(fkEstadoMunicipio) && idTipoCafe.equals(fkTipoCafe) &&
+                        qtdColhida != 0 &&
+                        areaPlantada != 0) {
 
                     // Extraindo valor das células e criando objeto plantação
 
@@ -113,27 +116,25 @@ public class Leitor {
                     plantacoes.add(plantacao);
 
                 }
-
-
             }
 
             // Fechando o workbook após a leitura
             workbook.close();
 
-            Log logFimLeitura = new Log(this.aplicacao + " ", LocalDateTime.now(), " Leitura do arquivo finalizada");
+            Log logFimLeitura = new Log("OK", this.aplicacao + " ", LocalDateTime.now(), " Leitura do arquivo finalizada", idFazenda, fkEmpresa, fkEstadoMunicipio);
+            logFimLeitura.inserirLogEmArquivo(logFimLeitura);
             System.out.println("\nLeitura do arquivo finalizada\n");
-            // conexao.inserirLogNoBanco(logFimLeitura);
-
+            conexaoBanco.inserirLogNoBanco(logFimLeitura);
+            logs.add(logFimLeitura);
             return plantacoes;
 
         } catch (IOException e) {
             // Caso ocorra algum erro durante a leitura do arquivo uma exceção será lançada
-            Log log = new Log(this.aplicacao + " ", LocalDateTime.now(), "Erro ao ler o arquivo" + e.getMessage());
+            Log log = new Log("ERRO", this.aplicacao + " ", LocalDateTime.now(), "Erro ao ler o arquivo");
             System.out.println("Erro ao ler o arquivo" + e.getMessage());
             // conexao.inserirLogNoBanco(log);
-            conexao.inserirLogNoBanco(log);
+            conexaoBanco.inserirLogNoBanco(log);
             throw new RuntimeException(e);
-
         }
     }
 
@@ -149,12 +150,10 @@ public class Leitor {
         if (row.getCell(num) == null) {
             return 0.0;
         }
-
         return row.getCell(num).getNumericCellValue();
     }
 
     private LocalDate converterDate(Date data) {
         return data.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
-
 }

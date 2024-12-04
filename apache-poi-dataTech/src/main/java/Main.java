@@ -16,49 +16,24 @@ import static service.SlackService.sendMessage;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-
         Application aplicacao = new Application();
-
         ConexaoBanco conexaoBanco = aplicacao.conectarComBanco();
-        JdbcTemplate conexao  = conexaoBanco.getConnection();
-
-       S3Service conexaoBucket = aplicacao.conectarComBucket();
-
-       aplicacao.baixarArquivosS3(conexaoBucket);
-
+        JdbcTemplate conexao = conexaoBanco.getConnection();
+        S3Service conexaoBucket = aplicacao.conectarComBucket();
+        aplicacao.baixarArquivosS3(conexaoBucket);
         //===================================================================================================================
-
         //Leitura
-
-        // List<EstadoMunicipio> estadosMunicipios = aplicacao.lerArquivoEstadoMunicipio();
-
-        // List<Clima> climas= aplicacao.lerArquivoClima();
-        List<Plantacao> plantacoes = aplicacao.lerArquivoPlantacoes(conexao);
-
-        List<EstadoMunicipio> estadosMunicipios = aplicacao.lerArquivoEstadoMunicipio();
-        sendMessage();
+        //List<Plantacao> plantacoes = aplicacao.lerArquivoPlantacoes(conexao);
+        //List<EstadoMunicipio> estadosMunicipios = aplicacao.lerArquivoEstadoMunicipio();
 
         List<Clima> climas = aplicacao.lerArquivoClima();
 
-        List<Plantacao> plantacoes = aplicacao.lerArquivoPlantacoes();
-
-
         //====================================================================================
-
         //BD
-
-        // aplicacao.inserirEstadoMunicipioNoBanco(estadosMunicipios);
-
-        aplicacao.inserirEstadoMunicipioNoBanco(estadosMunicipios);
-
-        // aplicacao.inserirClimasNobanco(climas);
-
-        aplicacao.inserirPlantacoesNoBanco(plantacoes);
-
+        //aplicacao.inserirPlantacoesNoBanco(plantacoes);
+        //aplicacao.inserirEstadoMunicipioNoBanco(estadosMunicipios);
+       aplicacao.inserirClimasNobanco(climas);
+        sendMessage();
         //===================================================================================================================
-
-
-
-
     }
 }

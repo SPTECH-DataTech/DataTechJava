@@ -2,6 +2,7 @@ package writer;
 
 import datatech.log.Log;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import processor.Plantacao;
 import processor.clima.Clima;
@@ -22,7 +23,6 @@ public class ConexaoBanco {
 
     public ConexaoBanco() {
         BasicDataSource basicDataSource = new BasicDataSource();
-
         basicDataSource.setUrl("jdbc:mysql://34.198.235.194:3306/datatech");
         basicDataSource.setUsername("root");
         basicDataSource.setPassword("datatech123");
@@ -31,25 +31,23 @@ public class ConexaoBanco {
     }
 
     public JdbcTemplate getConnection() {
-        if(singletonJdbcTemplate == null) {
+        if (singletonJdbcTemplate == null) {
             this.singletonJdbcTemplate = new JdbcTemplate(dataSource);
         }
-
         return this.singletonJdbcTemplate;
     }
 
+    public JdbcTemplate gerarNovaConexao() {
+        ConexaoBanco conexaoBanco = new ConexaoBanco();
+        JdbcTemplate connection = conexaoBanco.getConnection();
 
-    //    public JdbcTemplate gerarNovaConeexao() {
-//        ConexaoBanco conexaoBanco = new ConexaoBanco();
-//        JdbcTemplate connection = conexaoBanco.getConnection();
-//
-//        return connection;
-//    }
+        return connection;
+    }
 
-  /*  public void inserirLogNoBanco(Log log){
+    public void inserirLogNoBanco(Log log) {
         System.out.println(log.getData().toString() + log.getAplicacao() + log.getDescricao());
-        gerarNovaConeexao().update("INSERT INTO logJava (descricao) VALUES (?)",log.getData().toString() + " " + log.getAplicacao() + " " + log.getDescricao());
-    }*/
+    gerarNovaConexao().update("INSERT INTO logJava (statusLog, descricao, dataLog, fkFazenda, fkEmpresa, fkEstadoMunicipio) VALUES (?, ?, ?, ?, ?, ?)", log.getClassificacao(), log.getAplicacao() + " " + log.getDescricao(), log.getData().toString(), log.getFkFazenda(), log.getFkEmpresa(), log.getFkEstadoMunicipio());
+    }
 
     /*public void inserirPlantacoesNoBanco(List<Plantacao> plantacoes) {
         JdbcTemplate conexao = getConnection();
@@ -73,21 +71,42 @@ public class ConexaoBanco {
         conexao.batchUpdate(queries.toArray(new String[0]));
     }
 
-    public void inserirClimasNoBanco(List<Clima> climas) {
-        for (Clima clima : climas) {
-            System.out.println(clima.toString());
-            getConnection().update("INSERT INTO climaMunicipioDash (data, temperaturaMax, temperaturaMin, umidadeMedia) VALUES (?,?,?,?)",
-                    clima.getDataMedicao(), clima.getMediaTemperaturaMaxima(), clima.getMediaTemperaturaMinima(), clima.getUmidadeAr());
+    public Integer buscarFkMunicipio(String municipio) {
+        String sql = "SELECT id FROM estadoMunicipio WHERE municipio = ?";
+        try {
+            return getConnection().queryForObject(sql, new Object[]{municipio}, Integer.class);
+        } catch (Exception e) {
+            System.err.println("Erro ao buscar fkMunicipio: " + e.getMessage());
+            return null;
         }
     }
 
+    public void inserirClimasNoBanco(List<Clima> climas) {
+        for (Clima clima : climas) {
+        Integer fkMunicipio = buscarFkMunicipio(clima.getMunicipio());
+
+        if (fkMunicipio == null) {
+            System.out.println("fkMunicipio não encontrado: " + clima.getMunicipio() + ". Ignorando inserção...");
+            continue;
+        }
+
+
+            System.out.println(clima.toString());
+            getConnection().update("INSERT INTO climaMunicipioDash2 (fkMunicipio, dataCaptura, temperaturaMax, temperaturaMin, umidadeMedia) VALUES (?, ?, ?, ?, ?)",
+                    fkMunicipio,
+                    clima.getDataMedicao(),
+                    clima.getMediaTemperaturaMaxima(),
+                    clima.getMediaTemperaturaMinima(),
+                    clima.getUmidadeAr());
+        }
+    }
     public void inserirEstadoMunicipioNoBanco(List<EstadoMunicipio> estadoMunicipios) {
         JdbcTemplate conexao = getConnection();
         List<String> queries = new ArrayList<>();
         for (EstadoMunicipio estadoMunicipio : estadoMunicipios) {
             System.out.println(estadoMunicipio.toString());
             queries.add(String.format("INSERT IGNORE INTO estadoMunicipio(id, idUf, estado, municipio) VALUES (%d,%d,\"%s\",\"%s\")",
-                    estadoMunicipio.getIdMunicipio(), estadoMunicipio.getIdUf(), estadoMunicipio.getEstado(),  estadoMunicipio.getMunicipio()));
+                    estadoMunicipio.getIdMunicipio(), estadoMunicipio.getIdUf(), estadoMunicipio.getEstado(), estadoMunicipio.getMunicipio()));
         }
 
         conexao.batchUpdate(queries.toArray(new String[0]));
