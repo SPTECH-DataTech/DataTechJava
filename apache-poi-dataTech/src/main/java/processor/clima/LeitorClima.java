@@ -1,9 +1,13 @@
 package processor.clima;
 
+import com.mysql.cj.jdbc.JdbcConnection;
 import datatech.log.Log;
+import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.jdbc.core.JdbcOperations;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 import writer.ConexaoBanco;
 
 import java.io.FileWriter;
@@ -21,7 +25,11 @@ import static service.SlackService.sendMessage;
 public class LeitorClima {
     private String aplicacao = "LeitorClima";
     ConexaoBanco conexaoBanco = new ConexaoBanco();
+
     List<Log> logs = new ArrayList<>();
+    String municipio = "";
+    String campoMunicipio = "";
+
 
     public LeitorClima() {
     }
@@ -29,6 +37,8 @@ public class LeitorClima {
     public List<Clima> extrairClimas(Path nomeArquivo, InputStream arquivo) throws IOException {
         try {
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
+
+            String nomeArquivoString = nomeArquivo.toString();
 
             // Criando um objeto Workbook a partir do arquivo recebido
             Workbook workbook;
@@ -45,6 +55,13 @@ public class LeitorClima {
             for (Row row : sheet) {
                 Clima clima = new Clima();
 
+                if (row.getRowNum() == 0){
+                    Cell cell = row.getCell(0);
+                    campoMunicipio = cell.getStringCellValue();
+                    String[] partes = campoMunicipio.split(": ");
+                    municipio = partes[1];
+
+                }
                 if (row.getRowNum() < 11) {
 
                     System.out.println("\nLendo cabeçalho");
@@ -55,6 +72,8 @@ public class LeitorClima {
                         if (row.getRowNum() == 0) {
                             clima.setMunicipio(row.getCell(0).getStringCellValue());
                         }
+
+
 
                         if (cell != null && cell.getCellType() == CellType.STRING) {
                             String coluna = cell.getStringCellValue();
@@ -77,11 +96,19 @@ public class LeitorClima {
                 } else {
                     clima.setDataMedicao("Data não disponível");
                 }
+                Double mediaTemperaturaMaxima = lerValor(row.getCell(1));
+                Double mediaTemperaturaMinima = lerValor(row.getCell(2));
+                Double umidadeAr = lerValor(row.getCell(3));
+
+
+                if (mediaTemperaturaMaxima == 0.0 || mediaTemperaturaMinima == 0.0 || umidadeAr == 0.0) {
+                    continue;
+                }
 
                 clima.setMediaTemperaturaMaxima(lerValor(row.getCell(1)));
                 clima.setMediaTemperaturaMinima(lerValor(row.getCell(2)));
                 clima.setUmidadeAr(lerValor(row.getCell(3)));
-
+                clima.setMunicipio(municipio);
                 climasExtraidos.add(clima);
             }
 
@@ -91,6 +118,10 @@ public class LeitorClima {
             System.out.println("\nLeitura do arquivo finalizada\n");
             Log log = new Log("OK", this.aplicacao, LocalDateTime.now(), "Leitura do arquivo finalizada");
             logs.add(log);
+
+            System.out.println("Municipio: " + municipio);
+//            Log log = new Log("OK", this.aplicacao, LocalDateTime.now(), "Leitura do arquivo finalizada");
+
 //            conexaoBanco.inserirLogNoBanco(log);
             return climasExtraidos;
         } catch (IOException e) {
@@ -105,20 +136,25 @@ public class LeitorClima {
         if (cell == null) {
             return 0.0;
         }
+
         switch (cell.getCellType()) {
             case NUMERIC:
                 return cell.getNumericCellValue();
             case STRING:
+                String stringValue = cell.getStringCellValue().trim(); // Remove espaços em branco
+                if (stringValue.equalsIgnoreCase("null") || stringValue.isEmpty()) {
+                    return 0.0; // Retorna 0.0 se a string for "null" ou vazia
+                }
                 try {
-                    return Double.parseDouble(cell.getStringCellValue().replace(",", "."));
+                    return Double.parseDouble(stringValue.replace(",", "."));
                 } catch (NumberFormatException e) {
                     errorSlack(e);
                     System.err.println("Erro ao converter para Double: " + e.getMessage());
                     throw new Error("Erro ao converter para Double (Leitor Clima): " + e.getMessage(), e);
-                    // retutn 0.0;
                 }
             default:
                 return 0.0;
         }
+
     }
 }

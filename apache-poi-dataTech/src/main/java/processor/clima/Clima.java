@@ -2,6 +2,7 @@ package processor.clima;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 import static service.SlackService.errorSlack;
@@ -12,6 +13,9 @@ public class Clima {
     private Double mediaTemperaturaMaxima;
     private Double umidadeAr;
     private String municipio;
+    private Integer idFazenda;
+
+
 
 
     public Clima() {
@@ -26,22 +30,27 @@ public class Clima {
         this.municipio = municipio;
     }
 
+
     public String getDataMedicao() {
-        SimpleDateFormat formatoEntrada = new SimpleDateFormat("dd-MMM-yyyy", new Locale("pt", "BR"));  //Para formatar o parâmetro para Date
-        SimpleDateFormat formatoSaida = new SimpleDateFormat("yyyy-MM-dd");
-        try {
-            return formatoSaida.format(formatoEntrada.parse(dataMedicao));
-        } catch (Exception e) {
-            System.err.println("Erro ao converter a data: " + dataMedicao);
-            return null;
+        if (dataMedicao == null || dataMedicao.isEmpty()) {
+            return "Data não disponível";
         }
 
+        SimpleDateFormat formatoEntrada = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
+        SimpleDateFormat formatoSaida = new SimpleDateFormat("yyyy-MM-dd");
+
+        try {
+            Date data = formatoEntrada.parse(dataMedicao);
+            return formatoSaida.format(data);
+        } catch (Exception e) {
+            System.err.println("Erro ao converter a data: " + dataMedicao);
+            return "Data inválida";
+        }
     }
 
-    public void setDataMedicao(String dataMedicao) {
-       this.dataMedicao = dataMedicao;
+    public void setDataMedicao(String dataStr) {
+        this.dataMedicao = dataStr;
     }
-
     public Double getMediaTemperaturaMinima() {
         return mediaTemperaturaMinima;
     }
@@ -74,12 +83,23 @@ public class Clima {
         this.municipio = municipio;
     }
 
+    public Integer getIdFazenda() {
+        return idFazenda;
+    }
+
+    public void setIdFazenda(Integer idFazenda) {
+        this.idFazenda = idFazenda;
+    }
+
     @Override
     public String toString() {
         return "Clima{" +
-                "mediaTemperaturaMinima=" + mediaTemperaturaMinima +
+                "dataMedicao='" + dataMedicao + '\'' +
+                ", mediaTemperaturaMinima=" + mediaTemperaturaMinima +
                 ", mediaTemperaturaMaxima=" + mediaTemperaturaMaxima +
                 ", umidadeAr=" + umidadeAr +
+                ", municipio='" + municipio + '\'' +
+                ", idFazenda=" + idFazenda +
                 '}';
     }
 }

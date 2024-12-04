@@ -25,15 +25,17 @@ public class Main {
         aplicacao.baixarArquivosS3(conexaoBucket);
         //===================================================================================================================
         //Leitura
-        List<Plantacao> plantacoes = aplicacao.lerArquivoPlantacoes(conexao);
-        List<EstadoMunicipio> estadosMunicipios = aplicacao.lerArquivoEstadoMunicipio();
-        sendMessage();
-//        List<Clima> climas = aplicacao.lerArquivoClima();
+        //List<Plantacao> plantacoes = aplicacao.lerArquivoPlantacoes(conexao);
+        //List<EstadoMunicipio> estadosMunicipios = aplicacao.lerArquivoEstadoMunicipio();
+
+        List<Clima> climas = aplicacao.lerArquivoClima();
+
         //====================================================================================
         //BD
-        aplicacao.inserirPlantacoesNoBanco(plantacoes);
-        aplicacao.inserirEstadoMunicipioNoBanco(estadosMunicipios);
-//        aplicacao.inserirClimasNobanco(climas);
+        //aplicacao.inserirPlantacoesNoBanco(plantacoes);
+        //aplicacao.inserirEstadoMunicipioNoBanco(estadosMunicipios);
+       aplicacao.inserirClimasNobanco(climas);
+        sendMessage();
         //===================================================================================================================
         aplicacao.inserirLogEmArquivo();
     }

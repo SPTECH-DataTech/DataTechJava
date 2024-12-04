@@ -18,6 +18,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static service.OperationsCounter.registerFalied;
+
 public class SlackService {
     private static List<String> errorList = new ArrayList<>();
     private static final String TOKEN = System.getenv("TOKEN_SLACK");
@@ -84,7 +86,11 @@ public class SlackService {
             );
 
             errorList.add(errorMessage);
+
+            registerFalied();
+
             System.out.println("Erro registrado (SLACK)");
+            sendMessage();
     }
 
     public void listarErros(){
