@@ -2,13 +2,16 @@ package datatech.log;
 
 import writer.ConexaoBanco;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Scanner;
 
 public class Log {
 
@@ -21,6 +24,7 @@ public class Log {
     private Integer fkEmpresa;
     private Integer fkEstadoMunicipio;
     private ConexaoBanco conexao = new ConexaoBanco();
+    private List<Log> conteudoLogs = new ArrayList<>();
 
     public Log(String classificacao, String aplicacao, LocalDateTime dataHora, String descricao, Integer fkFazenda, Integer fkEmpresa, Integer fkEstadoMunicipio) {
         this.aplicacao = aplicacao;
@@ -39,10 +43,12 @@ public class Log {
         this.classificacao = classificacao;
     }
 
-    public void inserirLogEmArquivo(Log log) throws IOException {
+    public void inserirLogEmArquivo() throws IOException {
         String caminho = String.format("./log%s.txt", LocalDate.now());
-        String conteudo = "";
-        conteudo += String.format("(%s) %s : %s %s", classificacao, aplicacao, descricao, LocalDateTime.now());
+        String conteudo = String.format("(%s) %s : %s %s\n", classificacao, aplicacao, descricao, LocalDateTime.now());
+        for(int i = 0; i < conteudoLogs.size(); i++) {
+            conteudo += String.format("(%s) %s",conteudoLogs.get(i).classificacao, conteudoLogs.get(i).descricao, conteudoLogs.get(i).dataHora);
+        }
 
         FileWriter escritor = new FileWriter(caminho);
         escritor.write(conteudo);
@@ -103,5 +109,9 @@ public class Log {
 
     public void setFkEstadoMunicipio(Integer fkEstadoMunicipio) {
         this.fkEstadoMunicipio = fkEstadoMunicipio;
+    }
+
+    public List<Log> getConteudoLogs() {
+        return conteudoLogs;
     }
 }

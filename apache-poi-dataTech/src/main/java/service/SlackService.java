@@ -1,13 +1,16 @@
 package service;
 
+import com.google.protobuf.MapEntryLite;
 import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.SlackApiException;
 import com.slack.api.methods.request.chat.ChatPostMessageRequest;
 import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import com.slack.api.Slack;
+import datatech.log.Log;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -81,7 +84,6 @@ public class SlackService {
             );
 
             errorList.add(errorMessage);
-
             System.out.println("Erro registrado (SLACK)");
     }
 

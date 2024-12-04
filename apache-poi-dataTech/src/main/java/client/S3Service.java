@@ -6,15 +6,13 @@ import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,30 +24,33 @@ public class S3Service {
     private String bucketName;
     private String aplicacao = "conexao-bucket";
     ConexaoBanco conexao = new ConexaoBanco();
+    private List<Log> logs = new ArrayList<>();
 
     public S3Service(S3Client s3Client, String bucketName) {
         this.s3Client = s3Client;
         this.bucketName = bucketName;
     }
 
-    public void createBucket() {
+    public void createBucket() throws IOException {
         try {
             CreateBucketRequest createBucketRequest = CreateBucketRequest.builder()
                     .bucket(bucketName)
                     .build();
             s3Client.createBucket(createBucketRequest);
-//            Log log = new Log("OK", this.aplicacao + " ", LocalDateTime.now(), " Bucket criado com sucesso: " + bucketName);
+            Log log = new Log("OK", this.aplicacao + " ", LocalDateTime.now(), " Bucket criado com sucesso: " + bucketName);
+            logs.add(log);
 //            System.out.println(log);
 //            conexao.inserirLogNoBanco(log);
 
         } catch (S3Exception e) {
-//            Log log = new Log("ERRO", this.aplicacao + " ", LocalDateTime.now(), " Erro ao criar o bucket: " + bucketName);
-//            System.out.println(log);
+            Log log = new Log("ERRO", this.aplicacao + " ", LocalDateTime.now(), " Erro ao criar o bucket: " + bucketName);
+            System.out.println(log);
+            logs.add(log);
 //            conexao.inserirLogNoBanco(log);
         }
     }
 
-    public void uploadFiles(String filePath) {
+    public void uploadFiles(String filePath) throws IOException {
         try {
             File file = new File(filePath);
             String fileName = file.getName();
@@ -63,16 +64,18 @@ public class S3Service {
 
             Log log = new Log("OK", this.aplicacao + " ", LocalDateTime.now(), " Arquivo '" + file.getName() + "' enviado com sucesso com o nome: " + fileName);
             System.out.println(log);
+            logs.add(log);
             conexao.inserirLogNoBanco(log);
         } catch (S3Exception e) {
             System.err.println();
-//            Log log = new Log("ERRO", this.aplicacao + " ", LocalDateTime.now(), " Erro ao fazer upload do arquivo: " + filePath);
-//            System.out.println(log);
+            Log log = new Log("ERRO", this.aplicacao + " ", LocalDateTime.now(), " Erro ao fazer upload do arquivo: " + filePath);
+            System.out.println(log);
+            logs.add(log);
 //            conexao.inserirLogNoBanco(log);
         }
     }
 
-    public void listObjects() {
+    public void listObjects() throws IOException {
         try {
             ListObjectsRequest listObjects = ListObjectsRequest.builder()
                     .bucket(bucketName)
@@ -84,8 +87,9 @@ public class S3Service {
                 System.out.println("- " + s3Object.key());
             }
         } catch (S3Exception e) {
-//            Log log = new Log("ERRO", this.aplicacao + " ", LocalDateTime.now(), " Erro ao listar objetos no bucket: ");
-//            System.err.println(" Erro ao listar objetos no bucket: ");
+            Log log = new Log("ERRO", this.aplicacao + " ", LocalDateTime.now(), " Erro ao listar objetos no bucket: ");
+            System.err.println(" Erro ao listar objetos no bucket: ");
+            logs.add(log);
 //            conexao.inserirLogNoBanco(log);
         }
     }
@@ -122,7 +126,7 @@ public class S3Service {
 //        }
 //    }
 
-    public void downloadFiles() {
+    public void downloadFiles() throws IOException {
         try {
             String diretorioDownload = "./download-bases";
             List<S3Object> objects = s3Client.listObjects(ListObjectsRequest.builder().bucket(bucketName).build()).contents();
@@ -136,13 +140,15 @@ public class S3Service {
 
                 InputStream inputStream = s3Client.getObject(getObjectRequest, ResponseTransformer.toInputStream());
                 Files.copy(inputStream, new File(filePath).toPath());
-//                Log log = new Log("OK", this.aplicacao + " ", LocalDateTime.now(), " Arquivo baixado: " + object.key());
-//                System.out.println("Arquivo baixado: " + object.key());
+                Log log = new Log("OK", this.aplicacao + " ", LocalDateTime.now(), " Arquivo baixado: " + object.key());
+                System.out.println("Arquivo baixado: " + object.key());
+                logs.add(log);
 //                conexao.inserirLogNoBanco(log);
             }
         } catch (IOException | S3Exception e) {
-//            Log log = new Log("ERRO", this.aplicacao + " ", LocalDateTime.now(), " Erro ao fazer download dos arquivos: ");
-//            System.err.println("Erro ao fazer download dos arquivos");
+            Log log = new Log("ERRO", this.aplicacao + " ", LocalDateTime.now(), " Erro ao fazer download dos arquivos: ");
+            System.err.println("Erro ao fazer download dos arquivos");
+            logs.add(log);
 //            conexao.inserirLogNoBanco(log);
         }
     }

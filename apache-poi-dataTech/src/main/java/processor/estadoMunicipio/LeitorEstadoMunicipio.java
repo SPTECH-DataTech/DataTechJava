@@ -10,6 +10,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import processor.Plantacao;
 import writer.ConexaoBanco;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -24,15 +25,14 @@ public class LeitorEstadoMunicipio {
 
     String aplicacao = "LeitorEstadoMunicipio";
     ConexaoBanco conexao = new ConexaoBanco();
+    List<Log> logs = new ArrayList<>();
 
     public LeitorEstadoMunicipio() {
     }
 
-    public List<EstadoMunicipio> extrairEstadoMunicipio(Path nomeArquivo, InputStream arquivo) {
+    public List<EstadoMunicipio> extrairEstadoMunicipio(Path nomeArquivo, InputStream arquivo) throws IOException {
         try {
-//            Log logInicioLeitura = new Log("OK",this.aplicacao + " ", LocalDateTime.now(), " Iniciando leitura do arquivo %s\n".formatted(nomeArquivo));
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
-//             conexao.inserirLogNoBanco(logInicioLeitura);
 
             // Criando um objeto Workbook a partir do arquivo recebido
             Workbook workbook;
@@ -80,7 +80,8 @@ public class LeitorEstadoMunicipio {
             // Fechando o workbook após a leitura
             workbook.close();
 
-//            Log logFimLeitura = new Log("OK", this.aplicacao + " ", LocalDateTime.now(), " Leitura do arquivo finalizada");
+            Log log = new Log("OK", this.aplicacao + " ", LocalDateTime.now(), " Leitura do arquivo finalizada");
+            logs.add(log);
             System.out.println("\nLeitura do arquivo finalizada\n");
 //            conexao.inserirLogNoBanco(logFimLeitura);
 
@@ -88,8 +89,9 @@ public class LeitorEstadoMunicipio {
 
         } catch (IOException e) {
             // Caso ocorra algum erro durante a leitura do arquivo uma exceção será lançada
-//            Log log = new Log("ERRO", this.aplicacao + " ", LocalDateTime.now(), "Erro ao ler o arquivo" + e.getMessage());
+            Log log = new Log("ERRO", this.aplicacao + " ", LocalDateTime.now(), "Erro ao ler o arquivo" + e.getMessage());
             System.out.println("Erro ao ler o arquivo" + e.getMessage());
+            logs.add(log);
 
 //            conexao.inserirLogNoBanco(log);
 
@@ -100,6 +102,4 @@ public class LeitorEstadoMunicipio {
     private LocalDate converterDate(Date data) {
         return data.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
-
-
 }

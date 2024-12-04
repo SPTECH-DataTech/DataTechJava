@@ -45,7 +45,7 @@ public class ConexaoBanco {
 
     public void inserirLogNoBanco(Log log) {
         System.out.println(log.getData().toString() + log.getAplicacao() + log.getDescricao());
-    gerarNovaConexao().update("INSERT INTO logJava (statusLog, descricao, dataLog, fkFazenda, fkEmpresa, fkEstadoMunicipio) VALUES (?, ?, ?, ?, ?, ?)", log.getClassificacao(), log.getAplicacao() + " " + log.getDescricao(), log.getData().toString(), log.getFkFazenda(), log.getFkEmpresa(), log.getFkEstadoMunicipio());
+        gerarNovaConexao().update("INSERT IGNORE INTO logJava (statusLog, descricao, dataLog, fkFazenda, fkEmpresa, fkEstadoMunicipio) VALUES (?, ?, ?, ?, ?, ?)", log.getClassificacao(), log.getAplicacao() + " " + log.getDescricao(), log.getData().toString(), log.getFkFazenda(), log.getFkEmpresa(), log.getFkEstadoMunicipio());
     }
 
     /*public void inserirPlantacoesNoBanco(List<Plantacao> plantacoes) {
@@ -63,7 +63,7 @@ public class ConexaoBanco {
         List<String> queries = new ArrayList<>();
         for (Plantacao plantacao : plantacoes) {
             // System.out.println(estadoMunicipio.toString());
-            queries.add(String.format("INSERT INTO plantacaoFazenda (fkFazenda, fazenda_fkEmpresa, fazenda_fkEstadoMunicipio, ano, areaPlantada, quantidadeColhida, valorTotalReais) VALUES (%d, %d, %d, %d, %s, %s, %s);",
+            queries.add(String.format("INSERT IGNORE INTO plantacaoFazenda (fkFazenda, fazenda_fkEmpresa, fazenda_fkEstadoMunicipio, ano, areaPlantada, quantidadeColhida, valorTotalReais) VALUES (%d, %d, %d, %d, %s, %s, %s);",
                     plantacao.getFkFazenda(), plantacao.getFazenda_fkEmpresa(), plantacao.getFazenda_fkEstadoMunicipio(), plantacao.getAno(), plantacao.getAreaPlantada().toString().replace(",", "."), plantacao.getQuantidadeColhida().toString().replace(",", "."), plantacao.getValorReais().toString().replace(",", ".")));
         }
 
@@ -73,7 +73,7 @@ public class ConexaoBanco {
     public void inserirClimasNoBanco(List<Clima> climas) {
         for (Clima clima : climas) {
             System.out.println(clima.toString());
-            getConnection().update("INSERT INTO climaMunicipioDash (data, temperaturaMax, temperaturaMin, umidadeMedia) VALUES (?,?,?,?)",
+            getConnection().update("INSERT IGNORE INTO climaMunicipioDash (data, temperaturaMax, temperaturaMin, umidadeMedia) VALUES (?,?,?,?)",
                     clima.getDataMedicao(), clima.getMediaTemperaturaMaxima(), clima.getMediaTemperaturaMinima(), clima.getUmidadeAr());
         }
     }
@@ -86,7 +86,6 @@ public class ConexaoBanco {
             queries.add(String.format("INSERT IGNORE INTO estadoMunicipio(id, idUf, estado, municipio) VALUES (%d,%d,\"%s\",\"%s\")",
                     estadoMunicipio.getIdMunicipio(), estadoMunicipio.getIdUf(), estadoMunicipio.getEstado(), estadoMunicipio.getMunicipio()));
         }
-
         conexao.batchUpdate(queries.toArray(new String[0]));
     }
 }

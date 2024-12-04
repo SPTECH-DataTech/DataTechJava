@@ -12,6 +12,7 @@ import service.SlackService;
 import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 import writer.ConexaoBanco;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -31,11 +32,9 @@ public class Leitor {
     public Leitor() {
     }
 
-    public List<Plantacao> extrairPlantacao(String nomeArquivo, InputStream arquivo, JdbcTemplate conexao) {
+    public List<Plantacao> extrairPlantacao(String nomeArquivo, InputStream arquivo, JdbcTemplate conexao) throws IOException {
         try {
-//            Log logInicioLeitura = new Log("OK", this.aplicacao + " ", LocalDateTime.now(), " Iniciando leitura do arquivo %s\n".formatted(nomeArquivo));
             System.out.println("\nIniciando leitura do arquivo %s\n".formatted(nomeArquivo));
-//            conexaoBanco.inserirLogNoBanco(logInicioLeitura);
 
             // divide o nome do arquivo em 2 pelo traço (exemplo: plantacao-5.xlsx
             // vira [plantacao, 5.xlsx]
@@ -121,18 +120,17 @@ public class Leitor {
             // Fechando o workbook após a leitura
             workbook.close();
 
-            Log logFimLeitura = new Log("OK", this.aplicacao + " ", LocalDateTime.now(), " Leitura do arquivo finalizada", idFazenda, fkEmpresa, fkEstadoMunicipio);
-            logFimLeitura.inserirLogEmArquivo(logFimLeitura);
+            Log log = new Log("OK", this.aplicacao + " ", LocalDateTime.now(), " Leitura do arquivo finalizada", idFazenda, fkEmpresa, fkEstadoMunicipio);
             System.out.println("\nLeitura do arquivo finalizada\n");
-            conexaoBanco.inserirLogNoBanco(logFimLeitura);
-            logs.add(logFimLeitura);
+            logs.add(log);
+            conexaoBanco.inserirLogNoBanco(log);
             return plantacoes;
 
         } catch (IOException e) {
             // Caso ocorra algum erro durante a leitura do arquivo uma exceção será lançada
             Log log = new Log("ERRO", this.aplicacao + " ", LocalDateTime.now(), "Erro ao ler o arquivo");
             System.out.println("Erro ao ler o arquivo" + e.getMessage());
-            // conexao.inserirLogNoBanco(log);
+            logs.add(log);
             conexaoBanco.inserirLogNoBanco(log);
             throw new RuntimeException(e);
         }
